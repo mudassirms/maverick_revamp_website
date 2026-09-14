@@ -7,31 +7,37 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand accent — unchanged. This is your actual logo/nav color,
+        // not part of the neutral palette being reworked here.
         color: {
-          1: "#AC6AFF",
-          2: "#FFC876",
-          3: "#FF776F",
-          4: "#7ADB78",
-          5: "#858DFF",
-          6: "#FF98E2",
+          1: "#e11d2e", // primary red
+          2: "#c9a227", // primary gold
+          3: "#F2574D", // lighter red / coral
+          4: "#E8B84B", // lighter gold
+          5: "#8C2430", // deep red / maroon
+          6: "#A67C1E", // deep gold / bronze
         },
         stroke: {
-          1: "#26242C",
+          1: "#2C3340",
         },
+        // Cool charcoal/navy-gray neutral scale — white -> gray -> charcoal
+        // -> deep navy, instead of the warm espresso/brown tones. This is
+        // what makes red/gold pop as an accent rather than blending into
+        // a same-temperature warm background.
         n: {
-          1: "#FFFFFF",
-          2: "#CAC6DD",
-          3: "#ADA8C3",
-          4: "#757185",
-          5: "#3F3A52",
-          6: "#252134",
-          7: "#15131D",
-          8: "#0E0C15",
-          9: "#474060",
-          10: "#43435C",
-          11: "#1B1B2E",
-          12: "#2E2A41",
-          13: "#6C7275",
+          1: "#F7F8FA", // primary text — cool white, faint blue cast
+          2: "#DCE1E8", // light surface / inverted text
+          3: "#A9B2C0", // secondary text
+          4: "#7C8494", // muted labels, captions, placeholders
+          5: "#4A5262", // borders/accents on dark surfaces
+          6: "#333B4A", // card borders, dividers
+          7: "#1B212C", // card/panel surface background
+          8: "#12161F", // page background — deep charcoal-navy
+          9: "#5C6478", // mid slate, hover states
+          10: "#4F5768",
+          11: "#171B24", // secondary deep surface
+          12: "#262D3A", // raised panel alt
+          13: "#8891A0", // light slate
         },
       },
       fontFamily: {
@@ -69,7 +75,7 @@ export default {
       backgroundImage: {
         "radial-gradient": "radial-gradient(var(--tw-gradient-stops))",
         "conic-gradient":
-          "conic-gradient(from 225deg, #FFC876, #79FFF7, #9F53FF, #FF98E2, #FFC876)",
+          "conic-gradient(from 225deg, #c9a227, #e11d2e, #8C2430, #e11d2e, #c9a227)",
       },
     },
   },
