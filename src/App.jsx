@@ -11,11 +11,15 @@ import About from "./components/About";
 import ContactForm from "./components/ContactForm";
 import ProductDetail from "./pages/ProductDetail";
 import ServiceDetail from "./pages/ServiceDetail";
+import TeamMoments from "./components/TeamMoments";
+import Careers from "./pages/Careers";
+
 
 const Home = () => (
   <>
     <Hero />
     <About />
+    <TeamMoments />
     <Collaboration />
     <Services />
     <Products />
@@ -38,6 +42,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/careers" element={<Careers />} />
       </Routes>
 
       <Footer />

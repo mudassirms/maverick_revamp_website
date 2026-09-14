@@ -70,9 +70,9 @@ const Header = () => {
     Products: products.map((p) => ({ name: p.title, href: `/products/${p.slug}` })),
     Services: services.map((s) => ({ name: s.title, href: `/services/${s.slug}` })),
     Careers: [
-      { name: "Open Roles", href: "/careers" },
-      { name: "Culture", href: "/culture" },
-    ],
+  { name: "Open Roles", href: "/careers" },
+  { name: "Culture", href: "/careers#life-at-maverick" },
+],
   };
 
   const isDropdown = (name) => Object.keys(dropdownItems).includes(name);
