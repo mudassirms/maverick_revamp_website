@@ -22,12 +22,13 @@ const useReducedMotion = () => {
 };
 
 // ---- MaverickDine: live order-status grid + toast ----
+// (unified to the site's blue accent system — was red/gold)
 
 const dineTables = ["MH-01", "MH-02", "MH-03", "MH-04", "MH-05", "MH-06"];
 const dineStatusStyle = {
   idle: "bg-n-6 border-n-5",
-  active: "bg-[#e11d2e]/20 border-[#e11d2e]/60",
-  ready: "bg-[#c9a227]/20 border-[#c9a227]/60",
+  active: "bg-[#1D4ED8]/20 border-[#1D4ED8]/60",
+  ready: "bg-[#3B82F6]/20 border-[#3B82F6]/60",
 };
 
 const MaverickDineGraphic = () => {
@@ -85,7 +86,7 @@ const MaverickDineGraphic = () => {
             transition={{ duration: 0.3 }}
             className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-n-1 text-n-8 text-[0.65rem] font-code px-3 py-1.5 shadow-lg"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#e11d2e]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1D4ED8]" />
             {toast}
           </motion.div>
         )}
@@ -127,9 +128,9 @@ const MaverickHRGraphic = () => {
             <motion.div
               layoutId="hr-task-card"
               transition={{ type: "spring", stiffness: 260, damping: 24 }}
-              className="rounded-md bg-gradient-to-br from-[#e11d2e]/30 to-[#c9a227]/30 border border-[#c9a227]/40 h-9 flex items-center px-2"
+              className="rounded-md bg-gradient-to-br from-[#1D4ED8]/30 to-[#3B82F6]/30 border border-[#3B82F6]/40 h-9 flex items-center px-2"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c9a227] mr-1.5 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] mr-1.5 shrink-0" />
               <span className="text-[0.55rem] text-n-1 leading-tight">
                 Sprint task
               </span>
@@ -144,7 +145,10 @@ const MaverickHRGraphic = () => {
   );
 };
 
-// Fill in a real one-line description for BlackBuck and I'll drop it straight in.
+// Roadmap content.
+// NOTE: BlackBuck's description below is an honest "coming soon" placeholder,
+// not a real product description — swap `text` for the real one-liner
+// whenever it's available. Nothing here leaks internal/dev notes anymore.
 const roadmap = [
   {
     id: "0",
@@ -172,21 +176,21 @@ const roadmap = [
   {
     id: "3",
     title: "BlackBuck",
-    text: "In development — placeholder copy. Send over a line describing what this one does.",
+    text: "Currently in early development. Details on what BlackBuck does will be shared here as the product takes shape.",
     status: "progress",
     graphic: null,
   },
 ];
 
-// mock "under construction" graphic for products without a mockup yet
+// "under construction" graphic for products without a mockup yet
 const BuildingGraphic = () => (
   <div className="relative flex items-center justify-center h-full min-h-[12rem] bg-n-7">
     <div className="absolute inset-0 opacity-20">
       <img src={grid} className="w-full h-full object-cover" alt="" />
     </div>
     <div className="relative flex flex-col items-center gap-3">
-      <span className="relative flex items-center justify-center w-12 h-12 rounded-full border border-[#c9a227]/50 text-[#c9a227]">
-        <span className="absolute inset-0 rounded-full border border-[#c9a227]/40 motion-safe:animate-ping" />
+      <span className="relative flex items-center justify-center w-12 h-12 rounded-full border border-[#3B82F6]/50 text-[#3B82F6]">
+        <span className="absolute inset-0 rounded-full border border-[#3B82F6]/40 motion-safe:animate-ping" />
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
           <path
             d="M4 20 20 4M9 4H4v5M15 20h5v-5"
@@ -246,7 +250,7 @@ const RoadmapCard = ({ item, index }) => (
     whileHover={{ y: -6 }}
     className={`md:flex ${
       index % 2 !== 0 ? "md:translate-y-[4rem]" : ""
-    } p-[1px] rounded-[2rem] bg-gradient-to-br from-[#e11d2e]/30 via-n-6 to-[#c9a227]/30`}
+    } p-[1px] rounded-[2rem] bg-gradient-to-br from-[#1D4ED8]/30 via-n-6 to-[#3B82F6]/30`}
   >
     <div className="relative w-full bg-n-8 rounded-[calc(2rem-1px)] overflow-hidden">
       <div className="flex items-center justify-between p-6 pb-0">
@@ -315,13 +319,13 @@ const Roadmap = () => {
               <div className="flex flex-col items-center gap-2">
                 <span className="relative flex items-center justify-center">
                   {item.status !== "done" && (
-                    <span className="absolute inset-0 -m-1 rounded-full border border-[#c9a227]/40 motion-safe:animate-ping" />
+                    <span className="absolute inset-0 -m-1 rounded-full border border-[#3B82F6]/40 motion-safe:animate-ping" />
                   )}
                   <span
                     className={`block w-3.5 h-3.5 rounded-full ${
                       item.status === "done"
-                        ? "bg-gradient-to-br from-[#e11d2e] to-[#c9a227]"
-                        : "border-2 border-[#c9a227] bg-n-8"
+                        ? "bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6]"
+                        : "border-2 border-[#3B82F6] bg-n-8"
                     }`}
                   />
                 </span>
@@ -333,7 +337,7 @@ const Roadmap = () => {
                 <div className="relative flex-1 h-px mx-3 bg-n-6 overflow-hidden">
                   <div
                     ref={addSegment}
-                    className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#e11d2e] to-[#c9a227]"
+                    className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6]"
                   />
                 </div>
               )}

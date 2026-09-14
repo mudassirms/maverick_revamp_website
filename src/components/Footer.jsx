@@ -2,6 +2,16 @@ import { Link } from "react-router-dom";
 import Section from "./Section";
 import { socials } from "../constants";
 
+// Single source of truth for the office address — also used on the
+// Contact page (ContactPage.jsx OFFICE constant). If the address ever
+// changes, update it in both places, or better, lift this into a shared
+// constants file so it can never drift again.
+const OFFICE_ADDRESS =
+  "No 16 HIG-A Building No.20, 3rd Floor, KHB Colony, Shirke Layout, Kengeri, Bangalore 560060";
+const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  OFFICE_ADDRESS
+)}`;
+
 const Footer = () => {
   return (
     <Section
@@ -111,13 +121,12 @@ const Footer = () => {
               <p className="text-n-4 text-sm mt-2">
                 Address:{" "}
                 <a
-                  href="https://www.google.com/maps/place/3rd+Floor,+Vaishnavi+Signature,+Panathur+Main+Rd,+Bengaluru,+Karnataka+560103"
+                  href={MAPS_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-[#1D4ED8] transition-colors"
                 >
-                  No 16 HIG-A Building No.20 3rd Floor KHB colony shirke layout
-                  Kengeri Bangalore 560060
+                  {OFFICE_ADDRESS}
                 </a>
               </p>
             </div>

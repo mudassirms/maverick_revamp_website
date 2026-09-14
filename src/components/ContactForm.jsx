@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import { ToastContainer, toast } from "react-toastify";
 import { motion } from "framer-motion";
@@ -151,6 +151,13 @@ const ContactPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // this same component is rendered both as the standalone /contact route
+  // and as the embedded "Contact" section on the homepage (Section id="contact").
+  // Only the standalone page should show a breadcrumb — on the homepage it'd
+  // be redundant with the nav the visitor is already scrolled through.
+  const location = useLocation();
+  const isStandalonePage = location.pathname === "/contact";
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -228,12 +235,28 @@ const ContactPage = () => {
 
       <Section className="pt-[8rem]" id="contact">
         <div className="w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 relative z-2">
-          <Link
-            to="/"
-            className="font-code text-xs uppercase tracking-wider text-n-4 hover:text-n-1 mb-10 inline-block transition-colors"
-          >
-            ← Back to home
-          </Link>
+
+          {/* ==================================================
+              BREADCRUMB
+              Home > Contact — only on the standalone /contact page,
+              never when this section is embedded in the homepage
+             ================================================== */}
+          {isStandalonePage && (
+            <nav
+              aria-label="Breadcrumb"
+              className="mb-10 flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
+            >
+              <Link to="/" className="text-n-4 hover:text-[#c9a227] transition-colors">
+                Home
+              </Link>
+
+              <span className="text-n-6 select-none">›</span>
+
+              <span className="text-[#c9a227]" aria-current="page">
+                Contact
+              </span>
+            </nav>
+          )}
 
           {/* page hero */}
           <div className="max-w-2xl mb-14">

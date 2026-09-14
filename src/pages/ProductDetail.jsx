@@ -346,7 +346,7 @@ const ProductDetail = () => {
               {/* Product title */}
               <AnimatedHeading
                 text={product.title}
-                className="h1 mb-6"
+                className="h3 mb-6"
               />
 
 

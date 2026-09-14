@@ -222,12 +222,82 @@ const MaverickDineGraphic = () => {
   );
 };
 
+// a small roster: employee avatar pills light up top-to-bottom like an
+// attendance/roster check, then a bottom progress bar fills — loops
+const MaverickHRGraphic = () => {
+  const avatarsRef = useRef([]);
+  avatarsRef.current = [];
+  const addAvatar = (el) => el && avatarsRef.current.push(el);
+  const barFillRef = useRef(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.6 });
+    tl.set(avatarsRef.current, { opacity: 0.25, scale: 0.85 })
+      .set(barFillRef.current, { attr: { width: 0 } })
+      .to(avatarsRef.current, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        stagger: 0.12,
+        ease: "back.out(2)",
+      })
+      .to(barFillRef.current, { attr: { width: 168 }, duration: 1, ease: "power2.out" }, "-=0.2")
+      .to({}, { duration: 0.8 })
+      .to(avatarsRef.current, { opacity: 0.25, scale: 0.85, duration: 0.4, stagger: 0.06 })
+      .to(barFillRef.current, { attr: { width: 0 }, duration: 0.5, ease: "power1.in" }, "<");
+    return () => tl.kill();
+  }, []);
+
+  const rows = [
+    ["Priya Nair", "Team Lead"],
+    ["Arjun Rao", "Engineer"],
+    ["Sana Iyer", "Designer"],
+  ];
+
+  return (
+    <svg viewBox="0 0 200 190" width="176" height="167" className="overflow-visible">
+      <rect x="4" y="4" width="192" height="182" rx="16" fill="none" stroke="#e7e5e1" strokeOpacity="0.15" />
+
+      {rows.map(([name, role], i) => (
+        <g key={name} ref={addAvatar} transform={`translate(16 ${20 + i * 42})`}>
+          <circle cx="14" cy="14" r="14" fill="#c9a227" opacity="0.85" />
+          <text x="14" y="18" textAnchor="middle" fontFamily="monospace" fontSize="10" fontWeight="700" fill="#0e0e10">
+            {name.split(" ").map((w) => w[0]).join("")}
+          </text>
+          <text x="38" y="12" fontFamily="monospace" fontSize="9" fontWeight="700" fill="#e7e5e1">
+            {name}
+          </text>
+          <text x="38" y="24" fontFamily="monospace" fontSize="7" fill="#8a8a8a">
+            {role}
+          </text>
+          <circle cx="180" cy="14" r="4" fill="#2ecc71" />
+        </g>
+      ))}
+
+      <text x="16" y="156" fontFamily="monospace" fontSize="7" fill="#8a8a8a">
+        WEEKLY UTILIZATION
+      </text>
+      <rect x="16" y="164" width="168" height="6" rx="3" fill="#26262b" />
+      <rect ref={barFillRef} x="16" y="164" height="6" rx="3" fill="#c9a227" />
+    </svg>
+  );
+};
+
+// products with an entry here get the full animated rail + stage treatment.
+// anything else (e.g. products with only a screenshot, no custom graphic)
+// automatically falls into the "Explore more" grid below instead — so the
+// rail never renders a product with nothing to show.
 const graphicsBySlug = {
   datasense: <DataSenseGraphic />,
   supportsense: <SupportSenseGraphic />,
   notifybot: <NotifyBotGraphic />,
   maverickdine: <MaverickDineGraphic />,
+  maverickhr: <MaverickHRGraphic />,
 };
+
+const featuredProducts = products.filter((p) => graphicsBySlug[p.slug]);
+const moreProducts = products.filter((p) => !graphicsBySlug[p.slug]);
 
 const accentColor = (accent) => (accent === "gold" ? "#c9a227" : "#e11d2e");
 
@@ -306,11 +376,69 @@ const RailItem = ({ product, isActive, onSelect, autoplay, onCycle }) => {
   );
 };
 
+// ---- "Explore more" card: a lighter-weight, static entry for products
+// that don't have a custom animated graphic — just their real screenshot,
+// icon, name, and tagline, linking straight to the detail page ----
+
+const ExploreMoreCard = ({ product }) => {
+  const color = accentColor(product.accent);
+
+  return (
+    <Link
+      to={`/products/${product.slug}`}
+      className="group relative flex flex-col rounded-2xl border border-n-6 bg-n-7/40 overflow-hidden transition-colors hover:border-n-5"
+    >
+      <div className="relative aspect-[16/10] overflow-hidden border-b border-n-6 bg-n-8">
+        {product.screenshot ? (
+          <img
+            src={product.screenshot}
+            alt={`${product.title} screenshot`}
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="font-code text-xs uppercase tracking-wider text-n-4">
+              Preview coming soon
+            </span>
+          </div>
+        )}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style={{ background: `linear-gradient(to top, ${color}22, transparent 55%)` }}
+        />
+      </div>
+
+      <div className="flex flex-col flex-1 p-5">
+        <div className="flex items-center gap-2.5 mb-2">
+          {product.icon && (
+            <span
+              className="flex items-center justify-center w-8 h-8 rounded-lg border flex-shrink-0 overflow-hidden"
+              style={{ borderColor: `${color}55`, background: `${color}0f` }}
+            >
+              <img src={product.icon} alt="" className="w-4 h-4 object-contain" />
+            </span>
+          )}
+          <span className="h6">{product.title}</span>
+        </div>
+
+        <p className="body-2 text-n-4 text-sm mb-4">{product.tagline}</p>
+
+        <span className="mt-auto inline-flex items-center font-code text-[11px] font-bold uppercase tracking-wider text-n-3 group-hover:text-n-1 transition-colors">
+          View details
+          <span className="ml-1 inline-flex transition-transform duration-300 group-hover:translate-x-1">
+            <Arrow />
+          </span>
+        </span>
+      </div>
+    </Link>
+  );
+};
+
 const Products = () => {
-  const [activeSlug, setActiveSlug] = useState(products[0].slug);
+  const [activeSlug, setActiveSlug] = useState(featuredProducts[0]?.slug);
   const [autoplay, setAutoplay] = useState(true);
-  const activeIndex = products.findIndex((p) => p.slug === activeSlug);
-  const active = products[activeIndex];
+  const activeIndex = featuredProducts.findIndex((p) => p.slug === activeSlug);
+  const active = featuredProducts[activeIndex] ?? featuredProducts[0];
 
   const handleSelect = (slug) => {
     setActiveSlug(slug);
@@ -318,7 +446,7 @@ const Products = () => {
   };
 
   const handleCycle = () => {
-    setActiveSlug(products[(activeIndex + 1) % products.length].slug);
+    setActiveSlug(featuredProducts[(activeIndex + 1) % featuredProducts.length].slug);
   };
 
   return (
@@ -364,7 +492,7 @@ const Products = () => {
           {/* tab rail, grouped into a framed card on large screens instead
               of floating as a bare list */}
           <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-2 lg:py-2 pb-3 lg:pb-2 lg:rounded-3xl lg:border lg:border-n-6 lg:bg-n-7/40">
-            {products.map((product) => (
+            {featuredProducts.map((product) => (
               <RailItem
                 key={product.slug}
                 product={product}
@@ -417,6 +545,27 @@ const Products = () => {
             </AnimatePresence>
           </Panel>
         </motion.div>
+
+        {/* Explore more — every product without a custom animated graphic
+            (e.g. Schoolytics, Maverick Learn) shows here as a static card
+            with its real screenshot, instead of crowding the featured rail */}
+        {moreProducts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="mt-14 lg:mt-20"
+          >
+            <p className="tagline text-n-4 mb-6">Explore more</p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {moreProducts.map((product) => (
+                <ExploreMoreCard key={product.slug} product={product} />
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </Section>
   );
