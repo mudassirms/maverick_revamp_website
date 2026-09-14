@@ -4,7 +4,6 @@ import gsap from "gsap";
 
 const NODE_COUNT = 45;
 
-// Deterministic-per-mount layout (random once, not on every render)
 const generateNodes = () => {
   const nodes = [];
   for (let i = 0; i < NODE_COUNT; i++) {
@@ -18,7 +17,6 @@ const generateNodes = () => {
   return nodes;
 };
 
-// Connect each node to its 2 nearest neighbours, dedupe edges
 const generateEdges = (nodes) => {
   const edges = [];
   nodes.forEach((n, i) => {
@@ -50,7 +48,6 @@ const AINetworkBackground = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Nodes gently pulse, staggered
       nodeRefs.current.forEach((node, i) => {
         if (!node) return;
         gsap.to(node, {
@@ -65,7 +62,6 @@ const AINetworkBackground = () => {
         });
       });
 
-      // "Data" flows along each connecting line, staggered start
       lineRefs.current.forEach((line, i) => {
         if (!line) return;
         const length = line.getTotalLength();
@@ -79,7 +75,6 @@ const AINetworkBackground = () => {
         });
       });
 
-      // Whole network drifts very slowly, adds life without distraction
       gsap.to(svgRef.current, {
         rotate: 1.5,
         duration: 22,
@@ -108,8 +103,8 @@ const AINetworkBackground = () => {
       >
         <defs>
           <linearGradient id="aiLineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e11d2e" />
-            <stop offset="100%" stopColor="#c9a227" />
+            <stop offset="0%" stopColor="#1D4ED8" />
+            <stop offset="100%" stopColor="#3B82F6" />
           </linearGradient>
         </defs>
 
@@ -135,7 +130,7 @@ const AINetworkBackground = () => {
             cx={node.x}
             cy={node.y}
             r={node.r * 0.35}
-            fill={i % 3 === 0 ? "#c9a227" : "#e11d2e"}
+            fill={i % 3 === 0 ? "#60A5FA" : "#1D4ED8"}
             opacity="0.5"
           />
         ))}

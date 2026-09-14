@@ -7,37 +7,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand accent — unchanged. This is your actual logo/nav color,
-        // not part of the neutral palette being reworked here.
+        // Brand accent — two blue shades, no red/gold, no teal.
         color: {
-          1: "#e11d2e", // primary red
-          2: "#c9a227", // primary gold
-          3: "#F2574D", // lighter red / coral
-          4: "#E8B84B", // lighter gold
-          5: "#8C2430", // deep red / maroon
-          6: "#A67C1E", // deep gold / bronze
+          1: "#1D4ED8", // deep blue — primary accent
+          2: "#3B82F6", // bright blue — secondary accent
+          3: "#60A5FA", // light blue
+          4: "#93C5FD", // lighter blue tint
+          5: "#1E3A8A", // darkest blue
+          6: "#2563EB", // mid blue
         },
         stroke: {
-          1: "#2C3340",
+          1: "#C7CDD6", // visible mid-gray outline against white bg
         },
-        // Cool charcoal/navy-gray neutral scale — white -> gray -> charcoal
-        // -> deep navy, instead of the warm espresso/brown tones. This is
-        // what makes red/gold pop as an accent rather than blending into
-        // a same-temperature warm background.
+        // LIGHT THEME. n-1 is darkest (primary text), n-8 is lightest
+        // (page bg). Every component reads these tokens semantically
+        // (text-n-1, bg-n-8, border-n-6) so this alone re-lights the site.
         n: {
-          1: "#F7F8FA", // primary text — cool white, faint blue cast
-          2: "#DCE1E8", // light surface / inverted text
-          3: "#A9B2C0", // secondary text
-          4: "#7C8494", // muted labels, captions, placeholders
-          5: "#4A5262", // borders/accents on dark surfaces
-          6: "#333B4A", // card borders, dividers
-          7: "#1B212C", // card/panel surface background
-          8: "#12161F", // page background — deep charcoal-navy
-          9: "#5C6478", // mid slate, hover states
-          10: "#4F5768",
-          11: "#171B24", // secondary deep surface
-          12: "#262D3A", // raised panel alt
-          13: "#8891A0", // light slate
+          1: "#14161B", // primary text
+          2: "#3A3F4A", // secondary text
+          3: "#5C6472", // tertiary text
+          4: "#848C99", // muted labels/captions
+          5: "#B7BEC9", // borders/icons
+          6: "#D8DCE3", // card borders, dividers
+          7: "#F3F4F6", // panel/card bg
+          8: "#FFFFFF", // page bg
+          9: "#6B7280", // mid slate, hover
+          10: "#7C8493",
+          11: "#EDEFF2",
+          12: "#E4E7EC",
+          13: "#9AA3B0",
         },
       },
       fontFamily: {
@@ -75,7 +73,7 @@ export default {
       backgroundImage: {
         "radial-gradient": "radial-gradient(var(--tw-gradient-stops))",
         "conic-gradient":
-          "conic-gradient(from 225deg, #c9a227, #e11d2e, #8C2430, #e11d2e, #c9a227)",
+          "conic-gradient(from 225deg, #3B82F6, #1D4ED8, #1E3A8A, #1D4ED8, #3B82F6)",
       },
     },
   },

@@ -9,8 +9,9 @@ import gsap from "gsap";
  * circle and pinned so India sits front-and-center — not a true
  * rotating 3D sphere (that needs WebGL/three.js). Framer Motion and
  * GSAP can't texture-map a photo onto geometry, but combined with a
- * real photo they can get close to the reference look: atmosphere
- * glow, a glowing country outline, and an animated marker.
+ * real photo, a day/night shading pass, drifting cloud haze, and a
+ * starfield behind it, it reads as a real floating object rather than
+ * a flat circle.
  *
  * The India outline and the Bengaluru marker coordinates below were
  * derived from real lat/lon and checked pixel-for-pixel against the
@@ -48,6 +49,23 @@ const SRI_LANKA = [
 ];
 
 const BENGALURU = { x: 172.9, y: 308.4, label: "Bengaluru" };
+
+// glow color used for both the outline stroke/fill and its drop-shadow —
+// previously these were empty/invalid strings (`stroke=""`, `stroke="#"`,
+// `drop-shadow(0 0 4px )`) so the glow silently never rendered.
+
+// small fixed starfield behind the globe — positions are percentages of
+// an oversized wrapper so stars sit just outside the sphere's edge.
+const STARS = [
+  { x: 6, y: 12, size: 2, delay: 0 },
+  { x: 94, y: 8, size: 1.5, delay: 0.6 },
+  { x: 12, y: 90, size: 1.5, delay: 1.1 },
+  { x: 90, y: 94, size: 2, delay: 1.6 },
+  { x: 50, y: 2, size: 1, delay: 2.1 },
+  { x: 2, y: 55, size: 1, delay: 0.9 },
+  { x: 98, y: 62, size: 1.5, delay: 1.4 },
+  { x: 28, y: 96, size: 1, delay: 0.3 },
+];
 
 const toPath = (pts) =>
   pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]} ${p[1]}`).join(" ") + " Z";
@@ -108,6 +126,27 @@ export default function GlobeIndia() {
       className="relative mx-auto"
       style={{ width: VIEW, height: VIEW }}
     >
+      {/* Starfield, sitting just outside the sphere's own bounds */}
+      <div className="absolute pointer-events-none" style={{ inset: "-22%" }}>
+        {STARS.map((s, i) => (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-white"
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.size, height: s.size }}
+            animate={{ opacity: [0.15, 1, 0.15] }}
+            transition={{ duration: 2.4 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: s.delay }}
+          />
+        ))}
+      </div>
+
+      {/* Slow-rotating dashed orbit ring for a bit of tech polish */}
+      <motion.div
+        className="absolute rounded-full border border-dashed pointer-events-none"
+        style={{ inset: "-9%", borderColor: "rgba(120,190,255,0.22)" }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      />
+
       {/* Atmosphere glow, behind the sphere */}
       <div
         className="absolute rounded-full pointer-events-none"
@@ -130,7 +169,43 @@ export default function GlobeIndia() {
           boxShadow:
             "inset 12px -10px 40px rgba(0,0,0,0.65), inset -8px 8px 30px rgba(150,200,255,0.15), 0 0 0 1px rgba(120,190,255,0.25)",
         }}
-      />
+      >
+        {/* Drifting cloud haze — clipped to the circle by the parent's
+            overflow-hidden, screened on top of the photo texture */}
+        <motion.div
+          className="absolute inset-0"
+          animate={{ x: [0, -30, 0], y: [0, 8, 0] }}
+          transition={{ duration: 46, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background:
+              "radial-gradient(ellipse 220px 90px at 22% 28%, rgba(255,255,255,0.20), transparent 60%)," +
+              "radial-gradient(ellipse 260px 110px at 72% 62%, rgba(255,255,255,0.15), transparent 65%)," +
+              "radial-gradient(ellipse 180px 70px at 45% 88%, rgba(255,255,255,0.13), transparent 60%)",
+            mixBlendMode: "screen",
+            filter: "blur(2px)",
+          }}
+        />
+
+        {/* Day/night shading — gives the sphere an actual sense of
+            curvature instead of looking like a flat lit disc */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(115deg, transparent 32%, rgba(0,8,20,0.55) 78%, rgba(0,5,15,0.85) 100%)",
+            mixBlendMode: "multiply",
+          }}
+        />
+
+        {/* Specular highlight, top-left, to sell the "lit sphere" look */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.30), transparent 42%)",
+            mixBlendMode: "screen",
+          }}
+        />
+      </div>
 
       {/* Thin bright rim, matching the reference photo's edge highlight */}
       <div
@@ -148,19 +223,19 @@ export default function GlobeIndia() {
             ref={outlineRef}
             d={toPath(INDIA_OUTLINE)}
             fill="rgba(80,230,255,0.06)"
-            stroke=""
+            stroke=''
             strokeWidth="2"
             strokeLinejoin="round"
-            style={{ filter: "drop-shadow(0 0 4px )" }}
+            style={{ filter: `drop-shadow(0 0 4px )` }}
           />
           <path
             ref={sriLankaRef}
             d={toPath(SRI_LANKA)}
             fill="rgba(80,230,255,0.06)"
-            stroke="#"
+            stroke=''
             strokeWidth="1.5"
             strokeLinejoin="round"
-            style={{ filter: "drop-shadow(0 0 3px #)" }}
+            style={{ filter: `drop-shadow(0 0 3px )` }}
           />
         </g>
       </svg>

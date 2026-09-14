@@ -18,12 +18,15 @@ export const SideLines = () => {
   );
 };
 
+// Dots fade to bg-n-8 (page background) so they blend into white
+// instead of leaving a colored smudge. All three now sit within the
+// blue family rather than the old red/gold/teal mix.
 export const BackgroundCircles = () => {
   return (
     <>
-      <div className="absolute top-[4.4rem] left-16 w-3 h-3 bg-gradient-to-b from-[#DD734F] to-[#1A1A32] rounded-full"></div>
-      <div className="absolute top-[12.6rem] right-16 w-3 h-3 bg-gradient-to-b from-[#B9AEDF] to-[#1A1A32] rounded-full"></div>
-      <div className="absolute top-[26.8rem] left-12 w-6 h-6 bg-gradient-to-b from-[#88E5BE] to-[#1A1A32] rounded-full"></div>
+      <div className="absolute top-[4.4rem] left-16 w-3 h-3 bg-gradient-to-b from-[#1D4ED8] to-n-8 rounded-full"></div>
+      <div className="absolute top-[12.6rem] right-16 w-3 h-3 bg-gradient-to-b from-[#3B82F6] to-n-8 rounded-full"></div>
+      <div className="absolute top-[26.8rem] left-12 w-6 h-6 bg-gradient-to-b from-[#60A5FA] to-n-8 rounded-full"></div>
     </>
   );
 };
@@ -42,9 +45,7 @@ export const HamburgerMenu = () => {
       </div>
 
       <Rings />
-
       <SideLines />
-
       <BackgroundCircles />
     </div>
   );
