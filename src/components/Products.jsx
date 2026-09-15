@@ -10,12 +10,15 @@ import { products } from "../config/products";
 
 const AUTOPLAY_MS = 6000;
 
-// rim-light gradient border, shared visual language with About/Services
+// rim-light gradient border, shared visual language with About/Services.
+// Keys stay "red"/"gold"/"mixed" to match each product's existing
+// `accent` field in config/products — only the hex values moved to the
+// site's blue system.
 const Panel = ({ accent = "mixed", className = "", children }) => {
   const gradients = {
-    red: "from-[#e11d2e]/40 via-n-6 to-n-6",
-    gold: "from-[#c9a227]/40 via-n-6 to-n-6",
-    mixed: "from-[#e11d2e]/30 via-n-6 to-[#c9a227]/30",
+    red: "from-[#1D4ED8]/40 via-n-6 to-n-6",
+    gold: "from-[#3B82F6]/40 via-n-6 to-n-6",
+    mixed: "from-[#1D4ED8]/30 via-n-6 to-[#3B82F6]/30",
   };
   return (
     <div className={`rounded-3xl p-[1px] bg-gradient-to-br ${gradients[accent]} ${className}`}>
@@ -26,7 +29,9 @@ const Panel = ({ accent = "mixed", className = "", children }) => {
   );
 };
 
-// ---- per-product live graphics, driven by GSAP (unchanged, just used larger now) ----
+const accentColor = (accent) => (accent === "gold" ? "#3B82F6" : "#1D4ED8");
+
+// ---- per-product live graphics, driven by GSAP (unchanged) ----
 
 const DataSenseGraphic = () => {
   const barsRef = useRef([]);
@@ -47,7 +52,7 @@ const DataSenseGraphic = () => {
           <div
             ref={add}
             style={{ height: `${h * 100}%` }}
-            className="w-full rounded-t-sm bg-gradient-to-t from-[#e11d2e]/50 to-[#c9a227]/50"
+            className="w-full rounded-t-sm bg-gradient-to-t from-[#1D4ED8]/50 to-[#3B82F6]/50"
           />
         </div>
       ))}
@@ -73,7 +78,7 @@ const SupportSenseGraphic = () => {
       <div className="self-start max-w-[75%] rounded-xl rounded-bl-sm bg-n-6 px-4 py-3 body-2 text-n-3">
         How do I reset my password?
       </div>
-      <div className="self-end flex items-center gap-1.5 rounded-xl rounded-br-sm bg-gradient-to-br from-[#e11d2e]/30 to-[#c9a227]/30 px-4 py-3">
+      <div className="self-end flex items-center gap-1.5 rounded-xl rounded-br-sm bg-gradient-to-br from-[#1D4ED8]/30 to-[#3B82F6]/30 px-4 py-3">
         {[0, 1, 2].map((i) => (
           <span key={i} ref={add} className="w-2 h-2 rounded-full bg-n-1 opacity-30" />
         ))}
@@ -106,8 +111,8 @@ const NotifyBotGraphic = () => {
 
   return (
     <div className="relative w-40 h-40 mx-auto">
-      <span className="absolute inset-1/4 rounded-full border border-[#e11d2e]/40 motion-safe:animate-ping opacity-30" />
-      <span className="absolute inset-1/4 flex items-center justify-center rounded-full bg-n-7 border border-n-6 text-[#c9a227]">
+      <span className="absolute inset-1/4 rounded-full border border-[#1D4ED8]/40 motion-safe:animate-ping opacity-30" />
+      <span className="absolute inset-1/4 flex items-center justify-center rounded-full bg-n-7 border border-n-6 text-[#3B82F6]">
         <svg viewBox="0 0 24 24" width="26" height="26">
           {moduleIcons.bot}
         </svg>
@@ -126,7 +131,7 @@ const NotifyBotGraphic = () => {
           >
             <div
               ref={addIcon}
-              className="flex items-center justify-center w-full h-full rounded-full bg-n-7 border border-n-6 text-[#e11d2e]"
+              className="flex items-center justify-center w-full h-full rounded-full bg-n-7 border border-n-6 text-[#1D4ED8]"
             >
               <svg viewBox="0 0 24 24" width="18" height="18">
                 {moduleIcons[c.glyph]}
@@ -160,16 +165,14 @@ const MaverickDineGraphic = () => {
   return (
     <svg viewBox="0 0 160 210" width="148" height="194" className="overflow-visible">
       <defs>
-        {/* height animates 0 -> 150 to reveal the receipt top-to-bottom, like it's printing */}
         <clipPath id="mdPrintClip">
           <rect ref={clipRectRef} x="16" y="38" width="128" height="150" rx="2" />
         </clipPath>
       </defs>
 
-      {/* printer housing — sits above the clip, so it never needs to "hide" anything */}
       <rect x="10" y="10" width="140" height="30" rx="8" fill="#26262b" />
       <rect x="34" y="34" width="92" height="6" rx="3" fill="#0e0e10" />
-      <circle cx="126" cy="22" r="3" fill="#c9a227" />
+      <circle cx="126" cy="22" r="3" fill="#3B82F6" />
 
       <g clipPath="url(#mdPrintClip)">
         <rect x="18" y="36" width="124" height="168" rx="4" fill="#ffffff" stroke="#e7e5e1" />
@@ -192,18 +195,17 @@ const MaverickDineGraphic = () => {
 
         <line x1="26" y1="140" x2="134" y2="140" stroke="#e2e2e2" strokeDasharray="3 3" />
 
-        <text x="26" y="158" fontFamily="monospace" fontSize="9" fontWeight="700" fill="#e11d2e">TOTAL</text>
-        <text x="134" y="158" textAnchor="end" fontFamily="monospace" fontSize="9" fontWeight="700" fill="#e11d2e">₹420</text>
+        <text x="26" y="158" fontFamily="monospace" fontSize="9" fontWeight="700" fill="#1D4ED8">TOTAL</text>
+        <text x="134" y="158" textAnchor="end" fontFamily="monospace" fontSize="9" fontWeight="700" fill="#1D4ED8">₹420</text>
 
         <text x="80" y="188" textAnchor="middle" fontFamily="monospace" fontSize="7" fill="#a3a3a3">
           Thank you, come again!
         </text>
       </g>
 
-      {/* paid stamp, scales in once the total line has printed */}
       <g ref={stampRef}>
         <g transform="rotate(-14 128 150)">
-          <circle cx="128" cy="150" r="20" fill="none" stroke="#c9a227" strokeWidth="2.5" />
+          <circle cx="128" cy="150" r="20" fill="none" stroke="#3B82F6" strokeWidth="2.5" />
           <text
             x="128"
             y="150"
@@ -212,7 +214,7 @@ const MaverickDineGraphic = () => {
             fontFamily="monospace"
             fontSize="8"
             fontWeight="700"
-            fill="#c9a227"
+            fill="#3B82F6"
           >
             PAID
           </text>
@@ -261,7 +263,7 @@ const MaverickHRGraphic = () => {
 
       {rows.map(([name, role], i) => (
         <g key={name} ref={addAvatar} transform={`translate(16 ${20 + i * 42})`}>
-          <circle cx="14" cy="14" r="14" fill="#c9a227" opacity="0.85" />
+          <circle cx="14" cy="14" r="14" fill="#3B82F6" opacity="0.85" />
           <text x="14" y="18" textAnchor="middle" fontFamily="monospace" fontSize="10" fontWeight="700" fill="#0e0e10">
             {name.split(" ").map((w) => w[0]).join("")}
           </text>
@@ -279,15 +281,11 @@ const MaverickHRGraphic = () => {
         WEEKLY UTILIZATION
       </text>
       <rect x="16" y="164" width="168" height="6" rx="3" fill="#26262b" />
-      <rect ref={barFillRef} x="16" y="164" height="6" rx="3" fill="#c9a227" />
+      <rect ref={barFillRef} x="16" y="164" height="6" rx="3" fill="#3B82F6" />
     </svg>
   );
 };
 
-// products with an entry here get the full animated rail + stage treatment.
-// anything else (e.g. products with only a screenshot, no custom graphic)
-// automatically falls into the "Explore more" grid below instead — so the
-// rail never renders a product with nothing to show.
 const graphicsBySlug = {
   datasense: <DataSenseGraphic />,
   supportsense: <SupportSenseGraphic />,
@@ -299,33 +297,120 @@ const graphicsBySlug = {
 const featuredProducts = products.filter((p) => graphicsBySlug[p.slug]);
 const moreProducts = products.filter((p) => !graphicsBySlug[p.slug]);
 
-const accentColor = (accent) => (accent === "gold" ? "#c9a227" : "#e11d2e");
+// ---- section-wide cursor glow: a soft light that follows the pointer
+// anywhere over the section and tints itself to whichever product is
+// active, so the whole area feels alive rather than static ----
 
-// ---- tab rail item: icon + name + tagline, active state as a sliding
-// tinted card (shared layoutId) instead of a flat gray fill, plus a
-// contained progress bar instead of one pinned to the card's raw edge ----
+const CursorGlow = ({ color, targetId }) => {
+  const x = useMotionValue(-400);
+  const y = useMotionValue(-400);
+  const springX = useSpring(x, { stiffness: 60, damping: 22, mass: 0.6 });
+  const springY = useSpring(y, { stiffness: 60, damping: 22, mass: 0.6 });
 
-const RailItem = ({ product, isActive, onSelect, autoplay, onCycle }) => {
+  useEffect(() => {
+    const handle = (e) => {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      x.set(e.clientX - r.left);
+      y.set(e.clientY - r.top);
+    };
+    window.addEventListener("mousemove", handle);
+    return () => window.removeEventListener("mousemove", handle);
+  }, [targetId, x, y]);
+
+  return (
+    <motion.div
+      className="pointer-events-none absolute w-[34rem] h-[34rem] rounded-full blur-[130px] -z-10"
+      animate={{ background: `radial-gradient(circle, ${color}1a, transparent 70%)` }}
+      transition={{ duration: 0.5 }}
+      style={{ left: springX, top: springY, x: "-50%", y: "-50%" }}
+    />
+  );
+};
+
+// small pill that trails the cursor while it's over the stage, inviting
+// people to move their mouse over the graphic
+const FollowCursorHint = ({ containerRef, label }) => {
+  const [hovered, setHovered] = useState(false);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-30, 30], [3, -3]);
-  const rotateY = useTransform(x, [-30, 30], [-3, 3]);
-  const springX = useSpring(rotateY, { stiffness: 200, damping: 20 });
-  const springY = useSpring(rotateX, { stiffness: 200, damping: 20 });
+  const springX = useSpring(x, { stiffness: 320, damping: 30 });
+  const springY = useSpring(y, { stiffness: 320, damping: 30 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const move = (e) => {
+      const r = el.getBoundingClientRect();
+      x.set(e.clientX - r.left);
+      y.set(e.clientY - r.top);
+    };
+    const enter = () => setHovered(true);
+    const leave = () => setHovered(false);
+    el.addEventListener("mousemove", move);
+    el.addEventListener("mouseenter", enter);
+    el.addEventListener("mouseleave", leave);
+    return () => {
+      el.removeEventListener("mousemove", move);
+      el.removeEventListener("mouseenter", enter);
+      el.removeEventListener("mouseleave", leave);
+    };
+  }, [containerRef, x, y]);
+
+  return (
+    <AnimatePresence>
+      {hovered && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.7 }}
+          transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          style={{ left: springX, top: springY, x: "-50%", y: "-150%" }}
+          className="hidden lg:block absolute z-20 pointer-events-none px-3 py-1.5 rounded-full bg-n-1 text-n-8 body-2 text-xs font-semibold shadow-lg whitespace-nowrap"
+        >
+          {label}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// ---- tab rail item: icon + name + tagline, active state as a sliding
+// tinted card, with a gentle magnetic pull and icon nudge toward the
+// cursor so the whole rail feels touchable, not just clickable ----
+
+const RailItem = ({ product, isActive, onSelect, autoplay, onCycle }) => {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-30, 30], [4, -4]);
+  const rotateY = useTransform(x, [-30, 30], [-4, 4]);
+  const moveX = useTransform(x, [-40, 40], [-3, 3]);
+  const moveY = useTransform(y, [-40, 40], [-3, 3]);
+  const spring = { stiffness: 200, damping: 20 };
+  const springRX = useSpring(rotateX, spring);
+  const springRY = useSpring(rotateY, spring);
+  const springMX = useSpring(moveX, spring);
+  const springMY = useSpring(moveY, spring);
   const color = accentColor(product.accent);
+
+  const handleMove = (e) => {
+    const r = ref.current.getBoundingClientRect();
+    x.set(e.clientX - r.left - r.width / 2);
+    y.set(e.clientY - r.top - r.height / 2);
+  };
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.button
-      onMouseMove={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        x.set(e.clientX - r.left - r.width / 2);
-        y.set(e.clientY - r.top - r.height / 2);
-      }}
-      onMouseLeave={() => {
-        x.set(0);
-        y.set(0);
-      }}
-      style={{ rotateX: springY, rotateY: springX, transformStyle: "preserve-3d" }}
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ rotateX: springRY, rotateY: springRX, x: springMX, y: springMY, transformStyle: "preserve-3d" }}
       onClick={() => onSelect(product.slug)}
       className="group relative flex-shrink-0 w-64 lg:w-auto text-left px-5 py-4 rounded-2xl"
     >
@@ -338,7 +423,6 @@ const RailItem = ({ product, isActive, onSelect, autoplay, onCycle }) => {
         />
       )}
 
-      {/* accent tick that lights up on active/hover instead of a flat fill */}
       <span
         className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-full transition-opacity duration-300 ${
           isActive ? "opacity-100" : "opacity-0 group-hover:opacity-40"
@@ -347,46 +431,141 @@ const RailItem = ({ product, isActive, onSelect, autoplay, onCycle }) => {
       />
 
       <div className="relative flex items-center gap-3 mb-1.5">
-        <span
-          className="flex items-center justify-center w-9 h-9 rounded-xl border flex-shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105"
+        <motion.span
+          whileHover={{ rotate: [0, -10, 8, 0] }}
+          transition={{ duration: 0.45 }}
+          className="flex items-center justify-center w-9 h-9 rounded-xl border flex-shrink-0 shadow-sm"
           style={{ borderColor: `${color}55`, color, background: `${color}0f` }}
         >
           <svg viewBox="0 0 24 24" width="15" height="15">
             {moduleIcons[product.iconName]}
           </svg>
-        </span>
+        </motion.span>
         <span className="h6">{product.title}</span>
       </div>
       <p className="relative body-2 text-n-4 text-sm pl-12">{product.tagline}</p>
 
-      <div className="relative mt-3 ml-12 mr-1 h-[3px] rounded-full bg-n-6/70 overflow-hidden">
+      <div className="relative mt-3 ml-12 mr-1 h-[3px] rounded-full bg-n-6/70 overflow-visible">
         {isActive && (
           <motion.div
             key={product.slug}
-            className="h-full rounded-full"
+            className="relative h-full rounded-full"
             style={{ background: `linear-gradient(90deg, ${color}, ${color}99)` }}
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: AUTOPLAY_MS / 1000, ease: "linear" }}
             onAnimationComplete={() => autoplay && onCycle()}
-          />
+          >
+            <span
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+              style={{ background: color, boxShadow: `0 0 8px ${color}` }}
+            />
+          </motion.div>
         )}
       </div>
     </motion.button>
   );
 };
 
-// ---- "Explore more" card: a lighter-weight, static entry for products
-// that don't have a custom animated graphic — just their real screenshot,
-// icon, name, and tagline, linking straight to the detail page ----
+// ---- the stage: the tinted glass panel that shows the active product's
+// copy and graphic. tilts gently toward the cursor and lets the graphic
+// drift a touch further than the frame around it, so it reads as an
+// object sitting inside the glass rather than a flat image ----
+
+const Stage = ({ active }) => {
+  const ref = useRef(null);
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0.5);
+  const tiltSpring = { stiffness: 150, damping: 20 };
+  const rotateX = useSpring(useTransform(py, [0, 1], [6, -6]), tiltSpring);
+  const rotateY = useSpring(useTransform(px, [0, 1], [-8, 8]), tiltSpring);
+  const glowX = useTransform(px, [0, 1], ["15%", "85%"]);
+  const glowY = useTransform(py, [0, 1], ["15%", "85%"]);
+  const graphicSpring = { stiffness: 120, damping: 18 };
+  const graphicX = useSpring(useTransform(px, [0, 1], [12, -12]), graphicSpring);
+  const graphicY = useSpring(useTransform(py, [0, 1], [8, -8]), graphicSpring);
+
+  const handleMove = (e) => {
+    const r = ref.current.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width);
+    py.set((e.clientY - r.top) / r.height);
+  };
+  const handleLeave = () => {
+    px.set(0.5);
+    py.set(0.5);
+  };
+
+  const color = accentColor(active.accent);
+
+  return (
+    <div ref={ref} onMouseMove={handleMove} onMouseLeave={handleLeave} className="relative" style={{ perspective: "1400px" }}>
+      <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}>
+        <Panel accent={active.accent} className="min-h-[26rem] shadow-[0_30px_60px_-20px_rgba(20,22,27,0.15)]">
+          <motion.div
+            className="pointer-events-none absolute w-80 h-80 rounded-full blur-[90px]"
+            style={{ left: glowX, top: glowY, x: "-50%", y: "-50%", background: `${color}2e` }}
+          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active.slug}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className="relative flex flex-col md:flex-row items-center h-full p-8 lg:p-14 gap-10"
+            >
+              <div className="relative flex-1">
+                <p className="tagline text-n-4 mb-3">{active.tagline}</p>
+                <h3 className="h3 mb-4">{active.title}</h3>
+                <p className="body-1 text-n-3 mb-8 max-w-md">{active.shortDescription}</p>
+                <Link
+                  to={`/products/${active.slug}`}
+                  className="group/link inline-flex items-center font-code text-xs font-bold uppercase tracking-wider"
+                >
+                  Learn more
+                  <span className="ml-1 inline-flex transition-transform duration-300 group-hover/link:translate-x-1">
+                    <Arrow />
+                  </span>
+                </Link>
+              </div>
+
+              <motion.div
+                style={{ x: graphicX, y: graphicY }}
+                className="relative flex-1 flex items-center justify-center min-h-[10rem]"
+              >
+                {graphicsBySlug[active.slug]}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </Panel>
+      </motion.div>
+
+      <FollowCursorHint containerRef={ref} label="Move your cursor around" />
+    </div>
+  );
+};
+
+// ---- "Explore more" card: for products without a custom animated
+// graphic — a real screenshot with a spotlight that tracks the cursor
+// across the card, so even the quieter tier stays interactive ----
 
 const ExploreMoreCard = ({ product }) => {
   const color = accentColor(product.accent);
+  const cardRef = useRef(null);
+  const [pos, setPos] = useState({ x: 50, y: 0 });
+
+  const handleMove = (e) => {
+    const r = cardRef.current.getBoundingClientRect();
+    setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+  };
 
   return (
     <Link
+      ref={cardRef}
+      onMouseMove={handleMove}
       to={`/products/${product.slug}`}
-      className="group relative flex flex-col rounded-2xl border border-n-6 bg-n-7/40 overflow-hidden transition-colors hover:border-n-5"
+      className="group relative flex flex-col rounded-2xl border border-n-6 bg-n-7/40 overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:border-n-5"
+      style={{ backgroundImage: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${color}18, transparent 55%)` }}
     >
       <div className="relative aspect-[16/10] overflow-hidden border-b border-n-6 bg-n-8">
         {product.screenshot ? (
@@ -402,10 +581,6 @@ const ExploreMoreCard = ({ product }) => {
             </span>
           </div>
         )}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-          style={{ background: `linear-gradient(to top, ${color}22, transparent 55%)` }}
-        />
       </div>
 
       <div className="flex flex-col flex-1 p-5">
@@ -451,20 +626,8 @@ const Products = () => {
 
   return (
     <Section id="products" className="relative overflow-hidden">
-      {/* ambient mood glow — crossfades between red/gold so the whole
-          section's atmosphere subtly tracks whichever product is active,
-          instead of a static plain-white backdrop */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-        <motion.div
-          className="absolute top-10 left-[8%] w-[36rem] h-[36rem] rounded-full blur-[150px] bg-[#e11d2e]/[0.07]"
-          animate={{ opacity: active.accent === "gold" ? 0 : 1 }}
-          transition={{ duration: 0.6 }}
-        />
-        <motion.div
-          className="absolute top-10 left-[8%] w-[36rem] h-[36rem] rounded-full blur-[150px] bg-[#c9a227]/[0.07]"
-          animate={{ opacity: active.accent === "gold" ? 1 : 0 }}
-          transition={{ duration: 0.6 }}
-        />
+        <CursorGlow color={accentColor(active.accent)} targetId="products" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -489,8 +652,6 @@ const Products = () => {
           transition={{ duration: 0.6 }}
           className="grid lg:grid-cols-[280px_1fr] gap-6 lg:gap-10"
         >
-          {/* tab rail, grouped into a framed card on large screens instead
-              of floating as a bare list */}
           <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-2 lg:py-2 pb-3 lg:pb-2 lg:rounded-3xl lg:border lg:border-n-6 lg:bg-n-7/40">
             {featuredProducts.map((product) => (
               <RailItem
@@ -504,51 +665,9 @@ const Products = () => {
             ))}
           </div>
 
-          {/* stage */}
-          <Panel
-            accent={active.accent}
-            className="min-h-[26rem] shadow-[0_30px_60px_-20px_rgba(20,22,27,0.15)]"
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.slug}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className="relative flex flex-col md:flex-row items-center h-full p-8 lg:p-14 gap-10"
-              >
-                <div
-                  className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-[100px] pointer-events-none"
-                  style={{ background: `${accentColor(active.accent)}1a` }}
-                />
-
-                <div className="relative flex-1">
-                  <p className="tagline text-n-4 mb-3">{active.tagline}</p>
-                  <h3 className="h3 mb-4">{active.title}</h3>
-                  <p className="body-1 text-n-3 mb-8 max-w-md">{active.shortDescription}</p>
-                  <Link
-                    to={`/products/${active.slug}`}
-                    className="group/link inline-flex items-center font-code text-xs font-bold uppercase tracking-wider"
-                  >
-                    Learn more
-                    <span className="ml-1 inline-flex transition-transform duration-300 group-hover/link:translate-x-1">
-                      <Arrow />
-                    </span>
-                  </Link>
-                </div>
-
-                <div className="relative flex-1 flex items-center justify-center min-h-[10rem]">
-                  {graphicsBySlug[active.slug]}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </Panel>
+          <Stage active={active} />
         </motion.div>
 
-        {/* Explore more — every product without a custom animated graphic
-            (e.g. Schoolytics, Maverick Learn) shows here as a static card
-            with its real screenshot, instead of crowding the featured rail */}
         {moreProducts.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 24 }}

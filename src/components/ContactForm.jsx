@@ -9,8 +9,14 @@ import "react-toastify/dist/ReactToastify.css";
 import Section from "../components/Section";
 import AnimatedGlobe from "../components/AnimatedGlobe";
 
-// two-tone heading, same trick as the service/product pages — just
-// switched to the contact form's red-to-gold gradient.
+// ============================================================
+// MAVERICK IGNITE BLUE ACCENT SYSTEM
+// Matches Products.jsx exactly
+// Primary:   #1D4ED8
+// Secondary: #3B82F6
+// ============================================================
+
+// two-tone heading using the same blue system as Products.jsx
 const AnimatedHeading = ({ text, className = "" }) => {
   const words = text.split(" ");
   const splitAt = words.length > 3 ? words.length - 2 : words.length - 1;
@@ -19,7 +25,14 @@ const AnimatedHeading = ({ text, className = "" }) => {
 
   const wordVariants = {
     hidden: { opacity: 0, y: 24 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
   };
 
   return (
@@ -27,17 +40,29 @@ const AnimatedHeading = ({ text, className = "" }) => {
       className={className}
       initial="hidden"
       animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } }}
+      variants={{
+        visible: {
+          transition: {
+            staggerChildren: 0.07,
+            delayChildren: 0.1,
+          },
+        },
+      }}
     >
       {lead.map((word, i) => (
-        <motion.span key={`lead-${i}`} className="inline-block mr-[0.3em] text-n-1" variants={wordVariants}>
+        <motion.span
+          key={`lead-${i}`}
+          className="inline-block mr-[0.3em] text-n-1"
+          variants={wordVariants}
+        >
           {word}
         </motion.span>
       ))}
+
       {accent.map((word, i) => (
         <motion.span
           key={`accent-${i}`}
-          className="inline-block mr-[0.3em] bg-gradient-to-r from-[#e11d2e] to-[#c9a227] bg-clip-text text-transparent"
+          className="inline-block mr-[0.3em] bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6] bg-clip-text text-transparent"
           variants={wordVariants}
         >
           {word}
@@ -48,58 +73,101 @@ const AnimatedHeading = ({ text, className = "" }) => {
 };
 
 const fieldVariants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
+  hidden: {
+    opacity: 0,
+    y: 12,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
 };
 
-// same rim-light gradient border used across About/Services/Products/Roadmap —
-// still worth lifting into one shared component file at some point
+// ============================================================
+// Shared rim-light panel
+// Same gradient system as Products.jsx
+// ============================================================
+
 const Panel = ({ accent = "mixed", className = "", children }) => {
   const gradients = {
-    red: "from-[#e11d2e]/40 via-n-6 to-n-6",
-    gold: "from-[#c9a227]/40 via-n-6 to-n-6",
-    mixed: "from-[#e11d2e]/30 via-n-6 to-[#c9a227]/30",
+    red: "from-[#1D4ED8]/40 via-n-6 to-n-6",
+    gold: "from-[#3B82F6]/40 via-n-6 to-n-6",
+    mixed: "from-[#1D4ED8]/30 via-n-6 to-[#3B82F6]/30",
   };
+
   return (
-    <div className={`rounded-3xl p-[1px] bg-gradient-to-br ${gradients[accent]} ${className}`}>
-      <div className="relative h-full rounded-[calc(1.5rem-1px)] bg-n-8 overflow-hidden">{children}</div>
+    <div
+      className={`rounded-3xl p-[1px] bg-gradient-to-br ${gradients[accent]} ${className}`}
+    >
+      <div className="relative h-full rounded-[calc(1.5rem-1px)] bg-n-8 overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 };
+
+// ============================================================
+// Contact information cards
+// ============================================================
 
 const InfoCard = ({ label, value, index }) => (
   <motion.div
     initial={{ opacity: 0, y: 16 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    transition={{ duration: 0.4, delay: index * 0.08 }}
+    transition={{
+      duration: 0.4,
+      delay: index * 0.08,
+    }}
     className="rounded-2xl border border-n-6 bg-n-7/80 backdrop-blur-sm px-5 py-4"
   >
-    <p className="font-code text-[11px] uppercase tracking-wider text-n-4 mb-1">{label}</p>
+    <p className="font-code text-[11px] uppercase tracking-wider text-n-4 mb-1">
+      {label}
+    </p>
+
     <p className="text-n-1 font-medium">{value}</p>
   </motion.div>
 );
 
-// swap these for your real details
+// ============================================================
+// Contact details
+// ============================================================
+
 const contactDetails = [
-  { label: "Email", value: " Business@maverickignite.com" },
-  { label: "Phone / WhatsApp", value: "+91 9036666910" },
-  { label: "Response time", value: "Within one business day" },
+  {
+    label: "Email",
+    value: " Business@maverickignite.com",
+  },
+  {
+    label: "Phone / WhatsApp",
+    value: "+91 9036666910",
+  },
+  {
+    label: "Response time",
+    value: "Within one business day",
+  },
 ];
 
-// swap for your real office address
+// ============================================================
+// Office location
+// ============================================================
+
 const OFFICE = {
   name: "Kengeri Satellite Town",
   address: "Kengeri Satellite Town, Bengaluru, Karnataka",
 };
+
 const MAPS_QUERY = encodeURIComponent(OFFICE.address);
+
 const MAPS_EMBED_SRC = `https://www.google.com/maps?q=${MAPS_QUERY}&output=embed`;
+
 const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
 
-// dark-themed version of the "map + floating location card + open in
-// maps" pattern — same building blocks as a typical embedded-maps
-// contact section, restyled to match this site instead of Google's
-// default light chrome.
+// ============================================================
+// Map Card
+// Blue theme matched with Products.jsx
+// ============================================================
+
 const MapCard = () => (
   <motion.div
     initial={{ opacity: 0, y: 24 }}
@@ -121,22 +189,28 @@ const MapCard = () => (
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
-          {/* darken + tint the map slightly so it sits inside the dark theme
-              instead of glowing as a bright rectangle */}
+
+          {/* Darken map so it sits naturally inside the dark theme */}
           <div className="absolute inset-0 pointer-events-none bg-n-8/25 mix-blend-multiply" />
 
-          {/* floating location card, same idea as Google's own info window */}
-          {/* <div className="absolute left-4 top-4 sm:left-6 sm:top-6 max-w-[260px] rounded-2xl border border-n-6 bg-n-8/95 backdrop-blur-sm p-4 shadow-xl">
-            <p className="font-medium text-n-1 mb-1">{OFFICE.name}</p>
-            <p className="text-xs text-n-3 leading-relaxed">{OFFICE.address}</p>
-          </div> */}
+          {/* Optional floating location card */}
+          {/* 
+          <div className="absolute left-4 top-4 sm:left-6 sm:top-6 max-w-[260px] rounded-2xl border border-n-6 bg-n-8/95 backdrop-blur-sm p-4 shadow-xl">
+            <p className="font-medium text-n-1 mb-1">
+              {OFFICE.name}
+            </p>
+            <p className="text-xs text-n-3 leading-relaxed">
+              {OFFICE.address}
+            </p>
+          </div>
+          */}
         </div>
 
         <a
           href={MAPS_LINK}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 py-4 font-code text-xs font-bold uppercase tracking-wider text-[#e11d2e] hover:text-[#c9a227] transition-colors border-t border-n-6"
+          className="flex items-center justify-center gap-2 py-4 font-code text-xs font-bold uppercase tracking-wider text-[#1D4ED8] hover:text-[#3B82F6] transition-colors border-t border-n-6"
         >
           <span aria-hidden>📍</span>
           Open in Google Maps
@@ -146,119 +220,230 @@ const MapCard = () => (
   </motion.div>
 );
 
+// ============================================================
+// Contact Page
+// ============================================================
+
 const ContactPage = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // this same component is rendered both as the standalone /contact route
-  // and as the embedded "Contact" section on the homepage (Section id="contact").
-  // Only the standalone page should show a breadcrumb — on the homepage it'd
-  // be redundant with the nav the visitor is already scrolled through.
+  // This component is rendered both:
+  // 1. As standalone /contact
+  // 2. As embedded Contact section on homepage
   const location = useLocation();
+
   const isStandalonePage = location.pathname === "/contact";
+
+  // ============================================================
+  // Form change handler
+  // ============================================================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
     if (name === "email") {
-      setErrors((prev) => ({ ...prev, email: /\S+@\S+\.\S+/.test(value) ? "" : "Invalid email address" }));
+      setErrors((prev) => ({
+        ...prev,
+        email: /\S+@\S+\.\S+/.test(value)
+          ? ""
+          : "Invalid email address",
+      }));
     } else {
-      setErrors((prev) => ({ ...prev, [name]: value ? "" : `${name} is required` }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: value ? "" : `${name} is required`,
+      }));
     }
   };
 
+  // ============================================================
+  // Phone handler
+  // ============================================================
+
   const handlePhoneChange = (value) => {
-    setFormData((prev) => ({ ...prev, phone: value }));
-    setErrors((prev) => ({ ...prev, phone: value ? "" : "Phone number is required" }));
+    setFormData((prev) => ({
+      ...prev,
+      phone: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      phone: value ? "" : "Phone number is required",
+    }));
   };
+
+  // ============================================================
+  // Submit
+  // ============================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const { name, email, message, phone } = formData;
+
     if (!name || !email || !message || !phone) {
       toast.error("Please fill out all fields.");
       return;
     }
+
     if (errors.email || errors.phone) {
       toast.error("Please correct the errors.");
       return;
     }
+
     setLoading(true);
+
     emailjs
       .send(
         "service_04odo0c",
         "template_gqgqb4c",
-        { name, email, phone, message, time: new Date().toLocaleString(), title: "New Contact Form Submission" },
+        {
+          name,
+          email,
+          phone,
+          message,
+          time: new Date().toLocaleString(),
+          title: "New Contact Form Submission",
+        },
         "M-pTkSNkHoQjr6oSd"
       )
       .then(() => {
         toast.success("Message sent.");
-        setFormData({ name: "", email: "", phone: "", message: "" });
+
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
       })
       .catch((error) => {
         console.error("EmailJS Error:", error);
         toast.error("Something went wrong. Please try again.");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
+  // ============================================================
+  // Input styles
+  // Primary focus = #1D4ED8
+  // Secondary interaction = #3B82F6
+  // Error remains red because it is semantic validation state
+  // ============================================================
+
   const inputClass = (field) =>
-    `w-full p-3.5 rounded-xl bg-n-7 border text-n-1 placeholder-n-4 outline-none transition-colors duration-300 focus:border-[#c9a227]/70 ${
-      errors[field] ? "border-[#e11d2e]/70" : "border-n-6"
+    `w-full p-3.5 rounded-xl bg-n-7 border text-n-1 placeholder-n-4 outline-none transition-colors duration-300 focus:border-[#1D4ED8]/70 ${
+      errors[field]
+        ? "border-[#ef4444]/70"
+        : "border-n-6"
     }`;
+
+  // ============================================================
+  // Render
+  // ============================================================
 
   return (
     <div className="relative overflow-hidden">
-      <ToastContainer position="top-right" autoClose={4000} theme="dark" />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        theme="dark"
+      />
 
-      {/* full-bleed grid texture — same treatment as the service/product pages */}
+      {/* ======================================================
+          Full-bleed grid texture
+          ====================================================== */}
+
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.15]"
         style={{
           backgroundImage:
             "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)",
           backgroundSize: "44px 44px",
-          maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
-          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
+          maskImage:
+            "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
+        }}
+      />
+
+      {/* ======================================================
+          Ambient blue glows
+          Exact Product.jsx palette
+          ====================================================== */}
+
+      <div
+        className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full blur-[130px] opacity-20 pointer-events-none"
+        style={{
+          background: "#1D4ED8",
         }}
       />
 
       <div
-        className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full blur-[130px] opacity-20 pointer-events-none"
-        style={{ background: "#e11d2e" }}
-      />
-      <div
         className="absolute top-1/2 -left-40 w-[26rem] h-[26rem] rounded-full blur-[120px] opacity-10 pointer-events-none"
-        style={{ background: "#c9a227" }}
+        style={{
+          background: "#3B82F6",
+        }}
       />
 
-      <Section className="pt-[8rem]" id="contact">
+      {/* ======================================================
+          Main section
+          ====================================================== */}
+
+      <Section
+        className="pt-[8rem]"
+        id="contact"
+      >
         <div className="w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 relative z-2">
 
           {/* ==================================================
               BREADCRUMB
-              Home > Contact — only on the standalone /contact page,
-              never when this section is embedded in the homepage
-             ================================================== */}
+              ================================================== */}
+
           {isStandalonePage && (
             <nav
               aria-label="Breadcrumb"
               className="mb-10 flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
             >
-              <Link to="/" className="text-n-4 hover:text-[#c9a227] transition-colors">
+              <Link
+                to="/"
+                className="text-n-4 hover:text-[#3B82F6] transition-colors"
+              >
                 Home
               </Link>
 
-              <span className="text-n-6 select-none">›</span>
+              <span className="text-n-6 select-none">
+                ›
+              </span>
 
-              <span className="text-[#c9a227]" aria-current="page">
+              <span
+                className="text-[#3B82F6]"
+                aria-current="page"
+              >
                 Contact
               </span>
             </nav>
           )}
 
-          {/* page hero */}
+          {/* ==================================================
+              PAGE HERO
+              ================================================== */}
+
           <div className="max-w-2xl mb-14">
             <motion.p
               initial={{ opacity: 0 }}
@@ -268,36 +453,79 @@ const ContactPage = () => {
             >
               Get in touch
             </motion.p>
-            <AnimatedHeading text="Tell us what you're building" className="h1 mb-6" />
+
+            <AnimatedHeading
+              text="Tell us what you're building"
+              className="h1 mb-6"
+            />
+
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
+              initial={{
+                opacity: 0,
+                y: 16,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.6,
+                delay: 0.35,
+              }}
               className="body-1 text-n-3"
             >
-              A short note is enough — team size, the problem you&rsquo;re solving, and a rough
-              timeline. We&rsquo;ll reply within a business day.
+              A short note is enough — team size, the problem
+              you&rsquo;re solving, and a rough timeline. We&rsquo;ll
+              reply within a business day.
             </motion.p>
           </div>
 
-          {/* quick contact info */}
+          {/* ==================================================
+              QUICK CONTACT INFO
+              ================================================== */}
+
           <div className="grid sm:grid-cols-3 gap-4 mb-14">
             {contactDetails.map((c, i) => (
-              <InfoCard key={c.label} {...c} index={i} />
+              <InfoCard
+                key={c.label}
+                {...c}
+                index={i}
+              />
             ))}
           </div>
 
+          {/* ==================================================
+              FORM + GLOBE
+              ================================================== */}
+
           <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
-            {/* form panel */}
+
+            {/* ==================================================
+                FORM PANEL
+                ================================================== */}
+
             <motion.div
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
-              transition={{ staggerChildren: 0.08, delayChildren: 0.1 }}
+              transition={{
+                staggerChildren: 0.08,
+                delayChildren: 0.1,
+              }}
             >
-              <Panel accent="mixed" className="h-full">
+              <Panel
+                accent="mixed"
+                className="h-full"
+              >
                 <div className="p-8 lg:p-10">
-                  <form onSubmit={handleSubmit} className="space-y-4">
+
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                  >
+
+                    {/* NAME */}
+
                     <motion.div variants={fieldVariants}>
                       <input
                         type="text"
@@ -308,8 +536,15 @@ const ContactPage = () => {
                         className={inputClass("name")}
                         required
                       />
-                      {errors.name && <p className="text-[#e11d2e] text-sm mt-1">{errors.name}</p>}
+
+                      {errors.name && (
+                        <p className="text-[#ef4444] text-sm mt-1">
+                          {errors.name}
+                        </p>
+                      )}
                     </motion.div>
+
+                    {/* EMAIL */}
 
                     <motion.div variants={fieldVariants}>
                       <input
@@ -321,8 +556,15 @@ const ContactPage = () => {
                         className={inputClass("email")}
                         required
                       />
-                      {errors.email && <p className="text-[#e11d2e] text-sm mt-1">{errors.email}</p>}
+
+                      {errors.email && (
+                        <p className="text-[#ef4444] text-sm mt-1">
+                          {errors.email}
+                        </p>
+                      )}
                     </motion.div>
+
+                    {/* PHONE */}
 
                     <motion.div variants={fieldVariants}>
                       <PhoneInput
@@ -331,7 +573,12 @@ const ContactPage = () => {
                         onChange={handlePhoneChange}
                         enableSearch={true}
                         searchPlaceholder="Search country"
-                        preferredCountries={["us", "in", "gb", "ca"]}
+                        preferredCountries={[
+                          "us",
+                          "in",
+                          "gb",
+                          "ca",
+                        ]}
                         inputClass="!w-full !p-3.5 !bg-n-7 !text-n-1 !border !border-n-6 !rounded-xl"
                         buttonClass="!bg-n-7 !border-n-6 !rounded-l-xl"
                         dropdownClass="!bg-n-8 !text-n-1 !z-[1000] !max-h-[250px] !overflow-y-auto !border !border-n-6"
@@ -345,8 +592,15 @@ const ContactPage = () => {
                           marginBottom: "0.5rem",
                         }}
                       />
-                      {errors.phone && <p className="text-[#e11d2e] text-sm mt-1">{errors.phone}</p>}
+
+                      {errors.phone && (
+                        <p className="text-[#ef4444] text-sm mt-1">
+                          {errors.phone}
+                        </p>
+                      )}
                     </motion.div>
+
+                    {/* MESSAGE */}
 
                     <motion.div variants={fieldVariants}>
                       <textarea
@@ -358,56 +612,101 @@ const ContactPage = () => {
                         className={inputClass("message")}
                         required
                       />
-                      {errors.message && <p className="text-[#e11d2e] text-sm mt-1">{errors.message}</p>}
+
+                      {errors.message && (
+                        <p className="text-[#ef4444] text-sm mt-1">
+                          {errors.message}
+                        </p>
+                      )}
                     </motion.div>
 
-                    <motion.div variants={fieldVariants} className="relative">
+                    {/* ==================================================
+                        SUBMIT BUTTON
+                        Primary blue -> Secondary blue
+                        ================================================== */}
+
+                    <motion.div
+                      variants={fieldVariants}
+                      className="relative"
+                    >
                       {!loading && (
                         <motion.span
-                          className="absolute inset-0 rounded-xl border border-[#c9a227]/60 pointer-events-none"
-                          initial={{ opacity: 0.5, scale: 1 }}
-                          animate={{ opacity: 0, scale: 1.06 }}
-                          transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+                          className="absolute inset-0 rounded-xl border border-[#3B82F6]/60 pointer-events-none"
+                          initial={{
+                            opacity: 0.5,
+                            scale: 1,
+                          }}
+                          animate={{
+                            opacity: 0,
+                            scale: 1.06,
+                          }}
+                          transition={{
+                            duration: 1.8,
+                            repeat: Infinity,
+                            ease: "easeOut",
+                          }}
                         />
                       )}
+
                       <button
                         type="submit"
                         disabled={loading}
-                        className="relative w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-code text-xs font-bold uppercase tracking-wider text-n-8 bg-gradient-to-r from-[#e11d2e] to-[#c9a227] transition-transform duration-300 hover:scale-[1.015] disabled:opacity-60 disabled:hover:scale-100"
+                        className="relative w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-code text-xs font-bold uppercase tracking-wider text-n-8 bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6] transition-transform duration-300 hover:scale-[1.015] disabled:opacity-60 disabled:hover:scale-100"
                       >
                         {loading && (
                           <span className="w-4 h-4 border-2 border-n-8 border-t-transparent rounded-full motion-safe:animate-spin" />
                         )}
-                        {loading ? "Sending…" : "Send message"}
+
+                        {loading
+                          ? "Sending…"
+                          : "Send message"}
                       </button>
                     </motion.div>
+
                   </form>
                 </div>
               </Panel>
             </motion.div>
 
-            {/* globe panel */}
+            {/* ==================================================
+                GLOBE PANEL
+                ================================================== */}
+
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <Panel accent="gold" className="h-full">
+              <Panel
+                accent="gold"
+                className="h-full"
+              >
                 <div className="relative flex flex-col items-center justify-center h-full p-8 lg:p-10">
-                  <div className="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-[#c9a227]/10 blur-[100px] pointer-events-none" />
+
+                  {/* Blue ambient glow */}
+                  <div className="absolute top-10 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-[#3B82F6]/10 blur-[100px] pointer-events-none" />
+
                   <div className="relative aspect-square w-full max-w-sm">
                     <AnimatedGlobe />
                   </div>
+
                   <p className="tagline text-n-4 mt-6 text-center relative">
                     Every node is a decision your systems make for you.
                   </p>
+
                 </div>
               </Panel>
             </motion.div>
+
           </div>
 
+          {/* ==================================================
+              MAP
+              ================================================== */}
+
           <MapCard />
+
         </div>
       </Section>
     </div>

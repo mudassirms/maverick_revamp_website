@@ -17,6 +17,9 @@ import outingImg from "../assets/team/outing-4.jpg";
 import cricketImg from "../assets/team/cricket.jpg";
 import dinnerImg from "../assets/team/dinner.jpg";
 
+// shared gallery — also used on the home page as "Off the clock"
+import TeamMoments from "../components/TeamMoments";
+
 /* ============================================================
    DATA — edit freely, no structural changes needed
 ============================================================ */
@@ -80,14 +83,6 @@ const openRoles = [
   },
 ];
 
-const galleryCategories = ["All", "Outings", "Sports", "Office Life"];
-
-const galleryPhotos = [
-  { id: "g1", src: outingImg, caption: "Annual offsite — V-Zone Games", category: "Outings" },
-  { id: "g2", src: cricketImg, caption: "Inter-team cricket finals", category: "Sports" },
-  { id: "g3", src: dinnerImg, caption: "Friday team dinner", category: "Office Life" },
-];
-
 const values = [
   {
     icon: Lightbulb,
@@ -131,8 +126,15 @@ const hiringSteps = [
   { title: "Offer", description: "Clear compensation and a start date that works for you." },
 ];
 
+// used only for the hero's ambient background marquee, not the gallery section
+const heroPhotos = [
+  { id: "g1", src: outingImg, caption: "Annual offsite — V-Zone Games" },
+  { id: "g2", src: cricketImg, caption: "Inter-team cricket finals" },
+  { id: "g3", src: dinnerImg, caption: "Friday team dinner" },
+];
+
 /* ============================================================
-   MARQUEE ROW
+   MARQUEE ROW — ambient hero decoration only
    Duplicates the photo list so the loop is seamless.
 ============================================================ */
 
@@ -170,16 +172,7 @@ const MarqueeRow = ({ photos, direction = "left", speed = 34 }) => {
 };
 
 const Careers = () => {
-  const [activeCategory, setActiveCategory] = useState("All");
   const [openRoleId, setOpenRoleId] = useState(null);
-
-  const filteredGallery =
-    activeCategory === "All"
-      ? galleryPhotos
-      : galleryPhotos.filter((p) => p.category === activeCategory);
-
-  const rowA = filteredGallery.length ? filteredGallery : galleryPhotos;
-  const rowB = [...rowA].reverse();
 
   return (
     <div className="bg-n-8">
@@ -233,8 +226,8 @@ const Careers = () => {
 
         {/* hero marquee, bleeding to the edge */}
         <div className="mt-14 space-y-4">
-          <MarqueeRow photos={galleryPhotos} direction="left" speed={30} />
-          <MarqueeRow photos={[...galleryPhotos].reverse()} direction="right" speed={38} />
+          <MarqueeRow photos={heroPhotos} direction="left" speed={30} />
+          <MarqueeRow photos={[...heroPhotos].reverse()} direction="right" speed={38} />
         </div>
       </section>
 
@@ -316,39 +309,12 @@ const Careers = () => {
         </div>
       </section>
 
-      {/* ================= LIFE AT MAVERICK — MOVING GALLERY ================= */}
-      <section id="life-at-maverick" className="py-16 sm:py-24 border-t border-n-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-xl mb-8">
-            <h2 className="text-3xl sm:text-4xl font-bold text-n-1">Life at Maverick</h2>
-            <p className="mt-3 text-n-3 text-base sm:text-lg">
-              Outings, wins, and the everyday moments that make this a team,
-              not just an office.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-10">
-            {galleryCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`font-code text-[11px] font-semibold uppercase tracking-[0.12em] px-4 py-2 rounded-full border transition-colors duration-200 ${
-                  activeCategory === cat
-                    ? "bg-[#1D4ED8] border-[#1D4ED8] text-white"
-                    : "border-n-6 text-n-3 hover:text-n-1 hover:border-n-4"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <MarqueeRow photos={rowA} direction="left" speed={32} />
-          <MarqueeRow photos={rowB} direction="right" speed={40} />
-        </div>
-      </section>
+      {/* ================= LIFE AT MAVERICK ================= */}
+      <TeamMoments
+        id="life-at-maverick"
+        title="Life at Maverick"
+        description="Outings, wins, and the everyday moments that make this a team, not just an office."
+      />
 
       {/* ================= VALUES ================= */}
       <section className="py-16 sm:py-24 border-t border-n-6">
