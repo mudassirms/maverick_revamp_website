@@ -216,6 +216,11 @@ const TeamMemberPage = () => {
 
   const [imageFailed, setImageFailed] = useState(false);
 
+  const memberIndex = useMemo(
+    () => team.findIndex((person) => person.slug === slug),
+    [slug]
+  );
+
   const member = useMemo(
     () => team.find((person) => person.slug === slug),
     [slug]
@@ -228,18 +233,17 @@ const TeamMemberPage = () => {
 
     const ctx = gsap.context(() => {
       gsap.from("[data-member-reveal]", {
-        y: 30,
+        y: 22,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
+        duration: 0.7,
+        stagger: 0.08,
         ease: "power3.out",
       });
 
       if (imageRef.current) {
         gsap.from(imageRef.current, {
-          scale: 0.94,
-          opacity: 0,
-          duration: 1,
+          clipPath: "inset(0 0 100% 0)",
+          duration: 0.9,
           ease: "power3.out",
         });
       }
@@ -250,7 +254,7 @@ const TeamMemberPage = () => {
 
   if (!member) {
     return (
-      <Section>
+      <Section customPaddings="pt-28 pb-24 lg:pt-32 lg:pb-32">
         <div className="container py-32 text-center">
           <h1 className="h2 mb-6">Team member not found</h1>
 
@@ -274,8 +278,14 @@ const TeamMemberPage = () => {
     .slice(0, 2)
     .toUpperCase();
 
+  const fileNumber = String(memberIndex + 1).padStart(3, "0");
+
   return (
-    <Section crosses crossesOffset="lg:translate-y-[5.25rem]">
+    <Section
+      crosses
+      crossesOffset="lg:translate-y-[5.25rem]"
+      customPaddings="pt-10 pb-20 lg:pt-14 lg:pb-28"
+    >
       <div className="container relative z-2">
         {/* Background */}
         <div className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-[#1D4ED8]/[0.055] blur-[150px]" />
@@ -285,133 +295,189 @@ const TeamMemberPage = () => {
         </div>
 
         <div ref={contentRef} className="relative">
-          {/* Back */}
-          <div data-member-reveal className="mb-12">
+          {/* ==================================================
+              BREADCRUMB
+             ================================================== */}
+          <nav
+            aria-label="Breadcrumb"
+            data-member-reveal
+            className="mb-6 flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
+          >
+            <Link
+              to="/"
+              className="text-n-4 hover:text-[#3B82F6] transition-colors"
+            >
+              Home
+            </Link>
+
+            <span className="text-n-1 select-none">›</span>
+
             <Link
               to="/team"
-              className="group inline-flex items-center gap-3 font-code text-[10px] uppercase tracking-[0.18em] text-n-3 transition-colors hover:text-[#60A5FA]"
+              className="text-n-4 hover:text-[#3B82F6] transition-colors"
             >
-              <span className="transition-transform duration-300 group-hover:-translate-x-1">
-                ←
-              </span>
-
-              Back to team
+              Team
             </Link>
-          </div>
 
-          {/* Main */}
-          <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:gap-20">
-            {/* Photo */}
-            <div data-member-reveal>
+            <span className="text-n-1 select-none">›</span>
+
+            <span className="text-[#3B82F6]" aria-current="page">
+              {member.name}
+            </span>
+          </nav>
+
+          {/* ==================================================
+              DOSSIER HEADER — id card + name/meta ledger
+             ================================================== */}
+          <div className="grid gap-8 border-t border-n-6 pt-8 lg:grid-cols-[15.5rem_1fr] lg:gap-14 lg:pt-10">
+            {/* ID card */}
+            <div data-member-reveal className="lg:pt-1">
               <div
                 ref={imageRef}
-                className="relative mx-auto max-w-[28rem]"
+                className="relative mx-auto w-full max-w-[15.5rem] lg:mx-0"
               >
-                {/* Glow */}
-                <div className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-[#2563EB]/10 blur-[70px]" />
-
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-[#3B82F6]/25 bg-n-7 shadow-[0_30px_80px_-30px_rgba(37,99,235,0.45)]">
+                <div
+                  className="relative aspect-[3/4] overflow-hidden border border-[#3B82F6]/25 bg-n-7"
+                  style={{
+                    clipPath:
+                      "polygon(0 0, 100% 0, 100% 100%, 1.25rem 100%, 0 calc(100% - 1.25rem))",
+                  }}
+                >
                   {!imageFailed ? (
                     <img
                       src={member.photo}
                       alt={member.name}
                       onError={() => setImageFailed(true)}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover grayscale-[15%]"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B1220] via-[#101B32] to-[#07101F]">
-                      <span className="text-7xl font-semibold text-[#60A5FA]">
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#0B1220] via-[#101B32] to-[#07101F]">
+                      <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(#3B82F6 1px, transparent 1px), linear-gradient(90deg, #3B82F6 1px, transparent 1px)",
+                          backgroundSize: "18px 18px",
+                        }}
+                      />
+                      <span className="relative text-4xl font-semibold tracking-wide text-[#60A5FA]">
                         {initials}
                       </span>
                     </div>
                   )}
 
-                  {/* Bottom gradient */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+                  {/* scan line accent */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#3B82F6]/60" />
+                </div>
 
-                  {/* Number */}
-                  <div className="absolute left-5 top-5">
-                    <span className="font-code text-[9px] uppercase tracking-[0.2em] text-white/60">
-                      MaverickIgnite / People
-                    </span>
-                  </div>
+                {/* File tab */}
+                <div className="flex items-center justify-between border-x border-b border-n-6 bg-n-7 px-3 py-2">
+                  <span className="font-code text-[10px] uppercase tracking-[0.16em] text-n-4">
+                    File / {fileNumber}
+                  </span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
                 </div>
               </div>
             </div>
 
-            {/* Information */}
-            <div data-member-reveal>
-              <div className="mb-5 flex items-center gap-3">
-                <span className="h-px w-8 bg-[#3B82F6]" />
+            {/* Name + meta */}
+            <div data-member-reveal className="relative">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-4 right-0 hidden select-none font-code text-[7rem] font-bold leading-none text-n-6/40 lg:-top-8 lg:block xl:text-[9rem]"
+              >
+                {fileNumber}
+              </span>
 
+              <div className="mb-4 flex items-center gap-3">
+                <span className="h-px w-8 bg-[#3B82F6]" />
                 <span className="font-code text-[10px] uppercase tracking-[0.2em] text-[#60A5FA]">
                   {details?.department || member.department}
                 </span>
               </div>
 
-              <h1 className="h2 mb-5 max-w-3xl">
-                {member.name}
-              </h1>
+              <h1 className="h2 relative mb-5 max-w-xl">{member.name}</h1>
 
-              <p className="mb-8 text-lg leading-relaxed text-n-2 lg:text-xl">
+              <p className="body-1 mb-8 max-w-lg text-n-2">
                 {details?.introduction ||
                   "A member of the MaverickIgnite team contributing to the work we build together."}
               </p>
 
-              {/* Divider */}
-              <div className="mb-8 h-px w-full bg-n-6" />
+              {/* Spec sheet */}
+              <dl className="grid max-w-lg grid-cols-2 gap-x-6 gap-y-4 border-y border-n-6 py-5 sm:grid-cols-3">
+                <div>
+                  <dt className="font-code text-[9px] uppercase tracking-[0.18em] text-n-4">
+                    Role
+                  </dt>
+                  <dd className="mt-1 text-sm text-n-1">
+                    {details?.title || "Team Member"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-code text-[9px] uppercase tracking-[0.18em] text-n-4">
+                    Department
+                  </dt>
+                  <dd className="mt-1 text-sm text-n-1">
+                    {details?.department || member.department}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-code text-[9px] uppercase tracking-[0.18em] text-n-4">
+                    Status
+                  </dt>
+                  <dd className="mt-1 text-sm text-n-1">Active</dd>
+                </div>
+              </dl>
 
               {/* About */}
-              <div className="mb-10">
+              <div className="mt-8 max-w-lg">
                 <span className="font-code text-[9px] uppercase tracking-[0.2em] text-[#3B82F6]">
                   About
                 </span>
-
-                <p className="body-1 mt-4 max-w-2xl text-n-3">
+                <p className="body-2 mt-3 text-n-3">
                   {details?.about ||
                     "More information about this team member will be added soon."}
                 </p>
               </div>
 
-              {/* Expertise */}
+              {/* Expertise — inline ledger rather than pill tags */}
               {details?.expertise?.length > 0 && (
-                <div>
+                <div className="mt-8">
                   <span className="font-code text-[9px] uppercase tracking-[0.2em] text-[#3B82F6]">
                     Areas of focus
                   </span>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <ul className="mt-3 flex max-w-lg flex-wrap gap-x-6 gap-y-2">
                     {details.expertise.map((item) => (
-                      <span
+                      <li
                         key={item}
-                        className="rounded-full border border-[#3B82F6]/20 bg-[#3B82F6]/[0.04] px-4 py-2 text-sm text-n-2"
+                        className="flex items-center gap-2 text-sm text-n-2"
                       >
+                        <span className="h-1 w-1 rounded-full bg-[#3B82F6]" />
                         {item}
-                      </span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
             </div>
           </div>
 
           {/* ---------------------------------------------------------------- */}
-          {/* OTHER TEAM MEMBERS                                              */}
+          {/* OTHER TEAM MEMBERS — horizontal filmstrip                       */}
           {/* ---------------------------------------------------------------- */}
 
           <div
             data-member-reveal
-            className="mt-24 border-t border-n-6 pt-12 lg:mt-32"
+            className="mt-20 border-t border-n-6 pt-10 lg:mt-24"
           >
-            <div className="mb-8 flex items-end justify-between">
+            <div className="mb-6 flex items-end justify-between">
               <div>
                 <span className="font-code text-[9px] uppercase tracking-[0.2em] text-[#3B82F6]">
                   More people
                 </span>
 
-                <h2 className="h3 mt-3">
-                  Meet the rest of the team.
-                </h2>
+                <h2 className="h4 mt-2">Meet the rest of the team.</h2>
               </div>
 
               <Link
@@ -422,38 +488,30 @@ const TeamMemberPage = () => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="-mx-1 flex gap-3 overflow-x-auto pb-2">
               {team
                 .filter((person) => person.slug !== member.slug)
-                .slice(0, 5)
+                .slice(0, 6)
                 .map((person) => (
                   <Link
                     key={person.slug}
                     to={`/team/${person.slug}`}
-                    className="group"
+                    className="group flex w-32 flex-shrink-0 flex-col gap-2 px-1 sm:w-36"
                   >
-                    <div className="overflow-hidden rounded-xl border border-n-6 bg-n-7">
-                      <div className="aspect-square overflow-hidden">
-                        <img
-                          src={person.photo}
-                          alt={person.name}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          onError={(event) => {
-                            event.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
-
-                      <div className="p-3">
-                        <p className="text-sm font-medium text-n-1">
-                          {person.name}
-                        </p>
-
-                        <p className="mt-1 text-xs text-n-4">
-                          {person.department}
-                        </p>
-                      </div>
+                    <div className="relative aspect-[3/4] overflow-hidden border border-n-6 bg-n-7 transition-colors duration-300 group-hover:border-[#3B82F6]/40">
+                      <img
+                        src={person.photo}
+                        alt={person.name}
+                        className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                        }}
+                      />
                     </div>
+
+                    <p className="text-xs font-medium text-n-1 group-hover:text-[#60A5FA]">
+                      {person.name}
+                    </p>
                   </Link>
                 ))}
             </div>

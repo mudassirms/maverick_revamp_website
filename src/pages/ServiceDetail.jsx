@@ -511,7 +511,7 @@ const ServiceDetail = () => {
               Home
             </Link>
 
-            <span className="text-n-6 select-none">›</span>
+            <span className="text-n-1 select-none">›</span>
 
             <button
               type="button"
@@ -521,7 +521,7 @@ const ServiceDetail = () => {
               Services
             </button>
 
-            <span className="text-n-6 select-none">›</span>
+            <span className="text-n-1 select-none">›</span>
 
             <span className="text-[#3B82F6]" aria-current="page">
               {service.title}

@@ -9,14 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Section from "../components/Section";
 import AnimatedGlobe from "../components/AnimatedGlobe";
 
-// ============================================================
-// MAVERICK IGNITE BLUE ACCENT SYSTEM
-// Matches Products.jsx exactly
-// Primary:   #1D4ED8
-// Secondary: #3B82F6
-// ============================================================
 
-// two-tone heading using the same blue system as Products.jsx
 const AnimatedHeading = ({ text, className = "" }) => {
   const words = text.split(" ");
   const splitAt = words.length > 3 ? words.length - 2 : words.length - 1;
@@ -83,10 +76,6 @@ const fieldVariants = {
   },
 };
 
-// ============================================================
-// Shared rim-light panel
-// Same gradient system as Products.jsx
-// ============================================================
 
 const Panel = ({ accent = "mixed", className = "", children }) => {
   const gradients = {
@@ -105,10 +94,6 @@ const Panel = ({ accent = "mixed", className = "", children }) => {
     </div>
   );
 };
-
-// ============================================================
-// Contact information cards
-// ============================================================
 
 const InfoCard = ({ label, value, index }) => (
   <motion.div
@@ -129,9 +114,6 @@ const InfoCard = ({ label, value, index }) => (
   </motion.div>
 );
 
-// ============================================================
-// Contact details
-// ============================================================
 
 const contactDetails = [
   {
@@ -148,9 +130,6 @@ const contactDetails = [
   },
 ];
 
-// ============================================================
-// Office location
-// ============================================================
 
 const OFFICE = {
   name: "Kengeri Satellite Town",
@@ -163,10 +142,6 @@ const MAPS_EMBED_SRC = `https://www.google.com/maps?q=${MAPS_QUERY}&output=embed
 
 const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${MAPS_QUERY}`;
 
-// ============================================================
-// Map Card
-// Blue theme matched with Products.jsx
-// ============================================================
 
 const MapCard = () => (
   <motion.div
@@ -193,17 +168,6 @@ const MapCard = () => (
           {/* Darken map so it sits naturally inside the dark theme */}
           <div className="absolute inset-0 pointer-events-none bg-n-8/25 mix-blend-multiply" />
 
-          {/* Optional floating location card */}
-          {/* 
-          <div className="absolute left-4 top-4 sm:left-6 sm:top-6 max-w-[260px] rounded-2xl border border-n-6 bg-n-8/95 backdrop-blur-sm p-4 shadow-xl">
-            <p className="font-medium text-n-1 mb-1">
-              {OFFICE.name}
-            </p>
-            <p className="text-xs text-n-3 leading-relaxed">
-              {OFFICE.address}
-            </p>
-          </div>
-          */}
         </div>
 
         <a
@@ -220,9 +184,6 @@ const MapCard = () => (
   </motion.div>
 );
 
-// ============================================================
-// Contact Page
-// ============================================================
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -235,16 +196,9 @@ const ContactPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // This component is rendered both:
-  // 1. As standalone /contact
-  // 2. As embedded Contact section on homepage
   const location = useLocation();
 
   const isStandalonePage = location.pathname === "/contact";
-
-  // ============================================================
-  // Form change handler
-  // ============================================================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -269,10 +223,6 @@ const ContactPage = () => {
     }
   };
 
-  // ============================================================
-  // Phone handler
-  // ============================================================
-
   const handlePhoneChange = (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -285,9 +235,6 @@ const ContactPage = () => {
     }));
   };
 
-  // ============================================================
-  // Submit
-  // ============================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -339,12 +286,6 @@ const ContactPage = () => {
       });
   };
 
-  // ============================================================
-  // Input styles
-  // Primary focus = #1D4ED8
-  // Secondary interaction = #3B82F6
-  // Error remains red because it is semantic validation state
-  // ============================================================
 
   const inputClass = (field) =>
     `w-full p-3.5 rounded-xl bg-n-7 border text-n-1 placeholder-n-4 outline-none transition-colors duration-300 focus:border-[#1D4ED8]/70 ${
@@ -353,10 +294,6 @@ const ContactPage = () => {
         : "border-n-6"
     }`;
 
-  // ============================================================
-  // Render
-  // ============================================================
-
   return (
     <div className="relative overflow-hidden">
       <ToastContainer
@@ -364,10 +301,6 @@ const ContactPage = () => {
         autoClose={4000}
         theme="dark"
       />
-
-      {/* ======================================================
-          Full-bleed grid texture
-          ====================================================== */}
 
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.15]"
@@ -382,10 +315,6 @@ const ContactPage = () => {
         }}
       />
 
-      {/* ======================================================
-          Ambient blue glows
-          Exact Product.jsx palette
-          ====================================================== */}
 
       <div
         className="absolute -top-40 -right-40 w-[32rem] h-[32rem] rounded-full blur-[130px] opacity-20 pointer-events-none"
@@ -401,19 +330,12 @@ const ContactPage = () => {
         }}
       />
 
-      {/* ======================================================
-          Main section
-          ====================================================== */}
 
       <Section
         className="pt-[8rem]"
         id="contact"
       >
         <div className="w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 relative z-2">
-
-          {/* ==================================================
-              BREADCRUMB
-              ================================================== */}
 
           {isStandalonePage && (
             <nav
@@ -427,9 +349,9 @@ const ContactPage = () => {
                 Home
               </Link>
 
-              <span className="text-n-6 select-none">
+              <span className="text-n-2 select-none">
                 ›
-              </span>
+              </span> 
 
               <span
                 className="text-[#3B82F6]"
@@ -439,10 +361,6 @@ const ContactPage = () => {
               </span>
             </nav>
           )}
-
-          {/* ==================================================
-              PAGE HERO
-              ================================================== */}
 
           <div className="max-w-2xl mb-14">
             <motion.p
@@ -494,15 +412,9 @@ const ContactPage = () => {
             ))}
           </div>
 
-          {/* ==================================================
-              FORM + GLOBE
-              ================================================== */}
 
           <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
 
-            {/* ==================================================
-                FORM PANEL
-                ================================================== */}
 
             <motion.div
               initial="hidden"
@@ -620,11 +532,6 @@ const ContactPage = () => {
                       )}
                     </motion.div>
 
-                    {/* ==================================================
-                        SUBMIT BUTTON
-                        Primary blue -> Secondary blue
-                        ================================================== */}
-
                     <motion.div
                       variants={fieldVariants}
                       className="relative"
@@ -668,9 +575,6 @@ const ContactPage = () => {
               </Panel>
             </motion.div>
 
-            {/* ==================================================
-                GLOBE PANEL
-                ================================================== */}
 
             <motion.div
               initial={{ opacity: 0 }}
@@ -700,10 +604,6 @@ const ContactPage = () => {
             </motion.div>
 
           </div>
-
-          {/* ==================================================
-              MAP
-              ================================================== */}
 
           <MapCard />
 

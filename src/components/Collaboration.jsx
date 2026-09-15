@@ -2,20 +2,7 @@ import Button from "./Button";
 import Section from "./Section";
 import { LeftCurve, RightCurve } from "./design/Collaboration";
 
-// Point this at your icon-only logo mark
-// (not the full "MAVERICK IGNITE" text lockup).
 import logoMark from "/maverick-logo.png";
-
-// ============================================================
-// MAVERICK IGNITE BLUE ACCENT SYSTEM
-// Matches Products.jsx exactly
-//
-// Primary Blue:   #1D4ED8
-// Secondary Blue: #3B82F6
-// ============================================================
-
-
-// --- Inline icons ----------------------------------------------------------
 
 const CheckIcon = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -221,11 +208,6 @@ const Collaboration = () => {
   return (
     <Section crosses>
 
-      {/* ==========================================================
-          ANIMATIONS
-          Blue accent system
-          ========================================================== */}
-
       <style>{`
         @keyframes collab-spin {
           to {
@@ -424,9 +406,6 @@ const Collaboration = () => {
                   />
 
 
-                  {/* ==================================================
-                      LOGO CORE
-                      ================================================== */}
 
                   <div className="absolute inset-[0.2rem] flex items-center justify-center bg-n-8 rounded-full p-3">
 
@@ -443,10 +422,6 @@ const Collaboration = () => {
               </div>
 
 
-              {/* ==================================================
-                  ECOSYSTEM NODES
-                  ================================================== */}
-
               <ul>
 
                 {ecosystemNodes.map((node, index) => {
@@ -462,19 +437,9 @@ const Collaboration = () => {
                       }}
                     >
 
-                      {/* ==================================================
-                          RADIAL CONNECTOR
-                          Primary → Secondary blue
-                          ================================================== */}
-
                       <span
                         className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#1D4ED8]/10 via-[#3B82F6]/50 to-[#1D4ED8]/70"
                       />
-
-
-                      {/* ==================================================
-                          TRAVELING DATA PULSE
-                          ================================================== */}
 
                       <span
                         className="collab-dot absolute left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[#3B82F6] shadow-[0_0_8px_rgba(59,130,246,0.85)]"
@@ -482,11 +447,6 @@ const Collaboration = () => {
                           animationDelay: `${index * 0.4}s`,
                         }}
                       />
-
-
-                      {/* ==================================================
-                          NODE CARD
-                          ================================================== */}
 
                       <div
                         className="relative -top-[1.6rem] mx-auto flex h-[3.6rem] w-[3.6rem] flex-col items-center justify-center gap-1 rounded-xl border border-n-1/15 bg-n-7 shadow-[0_6px_20px_-8px_rgba(0,0,0,0.5)]"
@@ -505,20 +465,10 @@ const Collaboration = () => {
 
               </ul>
 
-
-              {/* ==================================================
-                  DECORATIVE CURVES
-                  ================================================== */}
-
               <LeftCurve />
               <RightCurve />
 
             </div>
-
-
-            {/* ====================================================
-                NODE LABELS
-                ==================================================== */}
 
             <div className="relative flex flex-wrap justify-center gap-2 mt-8">
 

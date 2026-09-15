@@ -238,7 +238,7 @@ const ProductDetail = () => {
                 Home
               </Link>
 
-              <span className="text-n-6 select-none">›</span>
+              <span className="text-n-1 select-none">›</span>
 
               <button
                 type="button"
@@ -248,7 +248,7 @@ const ProductDetail = () => {
                 Products
               </button>
 
-              <span className="text-n-6 select-none">›</span>
+              <span className="text-n-1 select-none">›</span>
 
               <span className="text-[#3B82F6]" aria-current="page">
                 {product.title}

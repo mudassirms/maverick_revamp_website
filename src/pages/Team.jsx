@@ -7,6 +7,21 @@ import Section from "../components/Section";
 import { BottomLine } from "../components/design/Hero";
 import AINetworkBackground from "../components/AINetworkBackground";
 
+// Photos are imported as modules (same pattern already used for `grid`/`check2`
+// elsewhere in this codebase) so the bundler resolves a real, working URL for
+// each one — string paths like "/assets/team/x.jpg" or "src/assets/team/x.jpg"
+// // aren't guaranteed to resolve at runtime and were why the photos weren't showing.
+// import raquibPhoto from "../assets/team/raquib.jpg";
+// import arifaPhoto from "../assets/team/arifa.jpg";
+import mudassirPhoto from "../assets/team/mudassir.jpeg";
+import saklenPhoto from "../assets/team/saklen.jpeg";
+import anasPhoto from "../assets/team/Anas.jpeg";
+import subhanPhoto from "../assets/team/subhan.png";
+// import asimPhoto from "../assets/team/asim.jpg";
+import ayanPhoto from "../assets/team/Ayan.png";
+import umairPhoto from "../assets/team/umair.jpeg";
+import sufiyanPhoto from "../assets/team/sufiyan.png";
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -17,104 +32,68 @@ if (typeof window !== "undefined") {
 
 export const team = [
   {
-    name: "Hifzur Raheman Sanderwale",
-    slug: "hifzur-raheman-sanderwale",
-    department: "Engineering",
-    photo: "/team/hifzur.jpg",
-  },
-  {
-    name: "Zeeshan Karmikhan",
-    slug: "zeeshan-karmikhan",
-    department: "Engineering",
-    photo: "/team/zeeshan.jpg",
-  },
-  {
-    name: "Yaseen Sanderwale",
-    slug: "yaseen-sanderwale",
-    department: "AI & Machine Learning",
-    photo: "/team/yaseen.jpg",
-  },
-  {
-    name: "Musadiq Sanderwale",
-    slug: "musadiq-sanderwale",
-    department: "Product & Design",
-    photo: "/team/musadiq.jpg",
-  },
-  {
-    name: "Tufail Sanderwale",
-    slug: "tufail-sanderwale",
-    department: "Technology",
-    photo: "/team/tufail.jpg",
-  },
-  {
-    name: "Naveed Patait",
-    slug: "naveed-patait",
-    department: "Technology",
-    photo: "/team/naveed.jpg",
-  },
-  {
     name: "Raquib Qadari",
     slug: "raquib-qadari",
     department: "Technology",
-    photo: "/team/raquib.jpg",
+    photo: null,
   },
   {
     name: "Arifa Chamanshaikh",
     slug: "arifa-chamanshaikh",
     department: "Operations",
-    photo: "/team/arifa.jpg",
+    photo: null,
   },
   {
     name: "Mudassir Sanderwale",
     slug: "mudassir-sanderwale",
     department: "Engineering",
-    photo: "/team/mudassir.jpg",
+    photo: mudassirPhoto,
   },
   {
     name: "Saklen Sajjan",
     slug: "saklen-sajjan",
     department: "Technology",
-    photo: "/team/saklen.jpg",
+    photo: saklenPhoto,
   },
   {
     name: "Anas Sanderwale",
     slug: "anas-sanderwale",
     department: "Technology",
-    photo: "/team/anas.jpg",
+    photo: anasPhoto,
   },
   {
     name: "Subhan Sanderwale",
     slug: "subhan-sanderwale",
     department: "Technology",
-    photo: "/team/subhan.jpg",
+    photo: subhanPhoto,
   },
   {
     name: "Asim Bage",
     slug: "asim-bage",
     department: "Technology",
-    photo: "/team/asim.jpg",
+    photo: null,
   },
 
   // Add interns here when you are ready.
-  // {
-  //   name: "Intern Name",
-  //   slug: "intern-name",
-  //   department: "Intern",
-  //   photo: "/team/intern-name.jpg",
-  // },
+  {
+    name: "Ayan Sajjan",
+    slug: "ayan-sajjan",
+    department: "Intern",
+    photo: ayanPhoto,
+  },
+  {
+    name: "Umair Sanderwale",
+    slug: "umair-sanderwale",
+    department: "Intern",
+    photo: umairPhoto,
+  },
+  {
+    name: "Sufiyan Sanderwale",
+    slug: "sufiyan-sanderwale",
+    department: "Intern",
+    photo: sufiyanPhoto,
+  },
 ];
-
-/* -------------------------------------------------------------------------- */
-/* HELPERS                                                                    */
-/* -------------------------------------------------------------------------- */
-
-const initialsOf = (name) =>
-  name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
 
 /* -------------------------------------------------------------------------- */
 /* EMPLOYEE CARD                                                              */
@@ -129,6 +108,12 @@ const EmployeeCard = ({ member, index }) => {
     if (!card) return;
 
     if (!window.matchMedia("(hover: hover)").matches) return;
+
+    // Give GSAP a recorded baseline for these two individual transform
+    // properties before quickTo ever touches them — without this, resetting
+    // to 0 on mouseleave has nothing to interpolate from and GSAP logs
+    // "not eligible for reset" to the console.
+    gsap.set(card, { transformPerspective: 800, rotateX: 0, rotateY: 0, force3D: true });
 
     const rotateX = gsap.quickTo(card, "rotateX", {
       duration: 0.45,
@@ -146,8 +131,8 @@ const EmployeeCard = ({ member, index }) => {
       const px = (event.clientX - rect.left) / rect.width - 0.5;
       const py = (event.clientY - rect.top) / rect.height - 0.5;
 
-      rotateY(px * 6);
-      rotateX(py * -6);
+      rotateY(px * 5);
+      rotateX(py * -5);
     };
 
     const onLeave = () => {
@@ -170,63 +155,34 @@ const EmployeeCard = ({ member, index }) => {
       ref={cardRef}
       data-reveal
       className="group block"
-      style={{
-        perspective: "1000px",
-      }}
+      style={{ perspective: "1000px" }}
     >
-      <div className="relative overflow-hidden rounded-[1.5rem] border border-n-6 bg-n-7 transition-all duration-500 group-hover:border-[#3B82F6]/40 group-hover:-translate-y-1 group-hover:shadow-[0_25px_70px_-25px_rgba(37,99,235,0.35)]">
-        {/* Image */}
-        <div className="relative aspect-[4/4.7] overflow-hidden bg-n-6">
-          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
+      {/* fixed aspect ratio on every card — no more mosaic tall/short mix */}
+      <div className="relative aspect-[4/4.8] overflow-hidden border border-n-6 bg-n-7 transition-all duration-500 group-hover:border-[#3B82F6]/40">
+        {/* Ghost index numeral */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-3 left-2 select-none font-code text-[5.5rem] font-bold leading-none text-white/[0.06]"
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
 
-          <div className="absolute top-4 left-4 z-20">
-            <span className="font-code text-[9px] uppercase tracking-[0.18em] text-white/70">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-          </div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
-          <EmployeeImage member={member} />
-          
-          {/* Hover overlay */}
-          <div className="absolute inset-0 z-20 flex items-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#1D4ED8]">
-              View profile
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M5 12h13" />
-                <path d="m13 6 6 6-6 6" />
-              </svg>
-            </span>
-          </div>
-        </div>
+        <EmployeeImage member={member} />
 
-        {/* Information */}
-        <div className="p-5">
-          <div className="mb-2">
-            <span className="font-code text-[9px] uppercase tracking-[0.18em] text-[#3B82F6]">
-              {member.department}
-            </span>
-          </div>
+        {/* Info overlay, pinned to the base of the photo */}
+        <div className="absolute inset-x-0 bottom-0 z-20 p-4">
+          <span className="font-code text-[9px] uppercase tracking-[0.18em] text-[#60A5FA]">
+            {member.department}
+          </span>
 
-          <h3 className="text-lg font-semibold text-n-1 transition-colors duration-300 group-hover:text-[#60A5FA]">
+          <h3 className="mt-1 flex items-center justify-between gap-2 text-base font-semibold text-white">
             {member.name}
-          </h3>
-
-          <div className="mt-4 flex items-center justify-between border-t border-n-6 pt-4">
-            <span className="font-code text-[9px] uppercase tracking-[0.16em] text-n-4">
-              Team member
-            </span>
-
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-n-6 text-n-3 transition-all duration-300 group-hover:border-[#3B82F6]/40 group-hover:bg-[#3B82F6]/10 group-hover:text-[#60A5FA]">
+            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-white/25 text-sm text-white opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100">
               →
             </span>
-          </div>
+          </h3>
         </div>
       </div>
     </Link>
@@ -238,30 +194,50 @@ const EmployeeCard = ({ member, index }) => {
 /* -------------------------------------------------------------------------- */
 
 const EmployeeImage = ({ member }) => {
-  const initials = initialsOf(member.name);
+  // If there's no photo import for this member (photo is null), skip the
+  // <img> entirely and go straight to the fallback — no broken-image flash,
+  // no reliance on onError firing for a src that was never valid.
+  const hasPhoto = Boolean(member.photo);
 
   return (
     <div className="relative h-full w-full">
-      <img
-        src={member.photo}
-        alt={member.name}
-        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        onError={(event) => {
-          event.currentTarget.style.display = "none";
-          event.currentTarget.nextElementSibling.style.display = "flex";
-        }}
-      />
+      {hasPhoto && (
+        <img
+          src={member.photo}
+          alt={member.name}
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          onError={(event) => {
+            // Covers the case where a photo import exists but fails to load
+            // at runtime (missing/corrupt asset file, bad path, etc.).
+            event.currentTarget.style.display = "none";
+            event.currentTarget.nextElementSibling.style.display = "flex";
+          }}
+        />
+      )}
 
       <div
-        className="absolute inset-0 hidden items-center justify-center"
+        className={`absolute inset-0 items-center justify-center ${
+          hasPhoto ? "hidden" : "flex"
+        }`}
         style={{
           background:
-            "radial-gradient(circle at center, rgba(59,130,246,0.18), transparent 65%), #080B12",
+            "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.16), transparent 65%), #0A0E17",
         }}
       >
-        <span className="text-5xl font-semibold text-[#60A5FA]">
-          {initials}
-        </span>
+        <svg
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-[#60A5FA]/80"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
       </div>
     </div>
   );
@@ -306,11 +282,11 @@ const TeamPage = () => {
       });
 
       gsap.from(content.querySelectorAll("[data-reveal]"), {
-        y: 25,
+        y: 20,
         opacity: 0,
-        duration: 0.7,
+        duration: 0.6,
         ease: "power3.out",
-        stagger: 0.07,
+        stagger: 0.06,
         scrollTrigger: {
           trigger: content,
           start: "top 82%",
@@ -325,6 +301,7 @@ const TeamPage = () => {
     <Section
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
+      customPaddings="pt-10 pb-20 lg:pt-14 lg:pb-28"
       id="team"
     >
       <div className="container relative z-2">
@@ -339,7 +316,7 @@ const TeamPage = () => {
         </div>
 
         {/* Progress line */}
-        <div className="relative mb-14 h-px w-full overflow-hidden rounded-full bg-n-6 lg:mb-20">
+        <div className="relative mb-10 h-px w-full overflow-hidden rounded-full bg-n-6 lg:mb-14">
           <div
             ref={progressRef}
             className="absolute inset-y-0 left-0 w-full origin-left scale-x-0 bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6]"
@@ -351,22 +328,27 @@ const TeamPage = () => {
           {/* INTRO                                                            */}
           {/* ---------------------------------------------------------------- */}
 
-          <div data-reveal className="mb-14 max-w-3xl lg:mb-20">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="h-px w-8 bg-[#3B82F6]" />
+          <div
+            data-reveal
+            className="mb-10 flex flex-col gap-6 border-b border-n-6 pb-10 lg:mb-14 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div className="max-w-2xl">
+              <div className="mb-5 flex items-center gap-3">
+                <span className="h-px w-8 bg-[#3B82F6]" />
 
-              <span className="font-code text-[10px] uppercase tracking-[0.2em] text-[#60A5FA]">
-                MaverickIgnite / Team
-              </span>
+                <span className="font-code text-[10px] uppercase tracking-[0.2em] text-[#60A5FA]">
+                  MaverickIgnite / Team
+                </span>
+              </div>
+
+              <h1 className="h2">
+                Meet the people
+                <br />
+                <span className="text-n-3">behind MaverickIgnite.</span>
+              </h1>
             </div>
 
-            <h1 className="h2 mb-6">
-              Meet the people
-              <br />
-              <span className="text-n-3">behind MaverickIgnite.</span>
-            </h1>
-
-            <p className="body-1 max-w-2xl text-n-2">
+            <p className="body-1 max-w-sm text-n-3 lg:text-right">
               A team of engineers, designers, builders, and problem solvers
               working together to turn ideas into intelligent products and
               scalable technology.
@@ -374,16 +356,12 @@ const TeamPage = () => {
           </div>
 
           {/* ---------------------------------------------------------------- */}
-          {/* TEAM GRID                                                        */}
+          {/* TEAM GRID — uniform roster                                       */}
           {/* ---------------------------------------------------------------- */}
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {team.map((member, index) => (
-              <EmployeeCard
-                key={member.slug}
-                member={member}
-                index={index}
-              />
+              <EmployeeCard key={member.slug} member={member} index={index} />
             ))}
           </div>
 
