@@ -11,6 +11,7 @@ import Roadmap from "./components/Roadmap";
 import Services from "./components/Services";
 import About from "./components/About";
 import ContactForm from "./components/ContactForm";
+import ScrollToTop from "./components/ScrollToTop";
 
 import ProductDetail from "./pages/ProductDetail";
 import ServiceDetail from "./pages/ServiceDetail";
@@ -35,6 +36,8 @@ const Home = () => {
 const App = () => {
   return (
     <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
+      <ScrollToTop />
+
       <Header />
 
       <Routes>

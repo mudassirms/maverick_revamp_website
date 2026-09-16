@@ -6,98 +6,35 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Section from "../components/Section";
 import { BottomLine } from "../components/design/Hero";
 import AINetworkBackground from "../components/AINetworkBackground";
+import { team } from "../config/team";
 
-// Photos are imported as modules (same pattern already used for `grid`/`check2`
-// elsewhere in this codebase) so the bundler resolves a real, working URL for
-// each one — string paths like "/assets/team/x.jpg" or "src/assets/team/x.jpg"
-// // aren't guaranteed to resolve at runtime and were why the photos weren't showing.
-// import raquibPhoto from "../assets/team/raquib.jpg";
-// import arifaPhoto from "../assets/team/arifa.jpg";
-import mudassirPhoto from "../assets/team/mudassir.jpeg";
-import saklenPhoto from "../assets/team/saklen.jpeg";
-import anasPhoto from "../assets/team/Anas.jpeg";
-import subhanPhoto from "../assets/team/subhan.png";
-// import asimPhoto from "../assets/team/asim.jpg";
-import ayanPhoto from "../assets/team/Ayan.png";
-import umairPhoto from "../assets/team/umair.jpeg";
-import sufiyanPhoto from "../assets/team/sufiyan.png";
+// Re-exported for backward compatibility in case anything still does
+// `import { team } from "./Team"` — the real data now lives in config/team.js.
+export { team };
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 /* -------------------------------------------------------------------------- */
-/* TEAM DATA                                                                  */
-/* -------------------------------------------------------------------------- */
-
-export const team = [
-  {
-    name: "Raquib Qadari",
-    slug: "raquib-qadari",
-    department: "Technology",
-    photo: null,
-  },
-  {
-    name: "Arifa Chamanshaikh",
-    slug: "arifa-chamanshaikh",
-    department: "Operations",
-    photo: null,
-  },
-  {
-    name: "Mudassir Sanderwale",
-    slug: "mudassir-sanderwale",
-    department: "Engineering",
-    photo: mudassirPhoto,
-  },
-  {
-    name: "Saklen Sajjan",
-    slug: "saklen-sajjan",
-    department: "Technology",
-    photo: saklenPhoto,
-  },
-  {
-    name: "Anas Sanderwale",
-    slug: "anas-sanderwale",
-    department: "Technology",
-    photo: anasPhoto,
-  },
-  {
-    name: "Subhan Sanderwale",
-    slug: "subhan-sanderwale",
-    department: "Technology",
-    photo: subhanPhoto,
-  },
-  {
-    name: "Asim Bage",
-    slug: "asim-bage",
-    department: "Technology",
-    photo: null,
-  },
-
-  // Add interns here when you are ready.
-  {
-    name: "Ayan Sajjan",
-    slug: "ayan-sajjan",
-    department: "Intern",
-    photo: ayanPhoto,
-  },
-  {
-    name: "Umair Sanderwale",
-    slug: "umair-sanderwale",
-    department: "Intern",
-    photo: umairPhoto,
-  },
-  {
-    name: "Sufiyan Sanderwale",
-    slug: "sufiyan-sanderwale",
-    department: "Intern",
-    photo: sufiyanPhoto,
-  },
-];
-
-/* -------------------------------------------------------------------------- */
 /* EMPLOYEE CARD                                                              */
 /* -------------------------------------------------------------------------- */
+
+const UserIcon = ({ size = 40 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
 
 const EmployeeCard = ({ member, index }) => {
   const cardRef = useRef(null);
@@ -157,7 +94,7 @@ const EmployeeCard = ({ member, index }) => {
       className="group block"
       style={{ perspective: "1000px" }}
     >
-      {/* fixed aspect ratio on every card — no more mosaic tall/short mix */}
+      {/* fixed aspect ratio on every card — no mosaic tall/short mix */}
       <div className="relative aspect-[4/4.8] overflow-hidden border border-n-6 bg-n-7 transition-all duration-500 group-hover:border-[#3B82F6]/40">
         {/* Ghost index numeral */}
         <span
@@ -194,9 +131,8 @@ const EmployeeCard = ({ member, index }) => {
 /* -------------------------------------------------------------------------- */
 
 const EmployeeImage = ({ member }) => {
-  // If there's no photo import for this member (photo is null), skip the
-  // <img> entirely and go straight to the fallback — no broken-image flash,
-  // no reliance on onError firing for a src that was never valid.
+  // No photo import for this member (photo is null) → skip the <img>
+  // entirely and go straight to the user-icon fallback.
   const hasPhoto = Boolean(member.photo);
 
   return (
@@ -207,8 +143,7 @@ const EmployeeImage = ({ member }) => {
           alt={member.name}
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           onError={(event) => {
-            // Covers the case where a photo import exists but fails to load
-            // at runtime (missing/corrupt asset file, bad path, etc.).
+            // Covers a photo import that exists but fails to load at runtime.
             event.currentTarget.style.display = "none";
             event.currentTarget.nextElementSibling.style.display = "flex";
           }}
@@ -216,28 +151,15 @@ const EmployeeImage = ({ member }) => {
       )}
 
       <div
-        className={`absolute inset-0 items-center justify-center ${
-          hasPhoto ? "hidden" : "flex"
-        }`}
+        className={`absolute inset-0 items-center justify-center ${hasPhoto ? "hidden" : "flex"}`}
         style={{
           background:
             "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.16), transparent 65%), #0A0E17",
         }}
       >
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-[#60A5FA]/80"
-        >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
+        <span className="text-[#60A5FA]/80">
+          <UserIcon />
+        </span>
       </div>
     </div>
   );
@@ -325,22 +247,28 @@ const TeamPage = () => {
 
         <div ref={contentRef} className="relative">
           {/* ---------------------------------------------------------------- */}
-          {/* INTRO                                                            */}
+          {/* BREADCRUMB + INTRO                                               */}
           {/* ---------------------------------------------------------------- */}
+
+          <nav
+            aria-label="Breadcrumb"
+            data-reveal
+            className="mb-6 flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
+          >
+            <Link to="/" className="text-n-4 transition-colors hover:text-[#3B82F6]">
+              Home
+            </Link>
+            <span className="select-none text-n-1">›</span>
+            <span className="text-[#3B82F6]" aria-current="page">
+              Team
+            </span>
+          </nav>
 
           <div
             data-reveal
             className="mb-10 flex flex-col gap-6 border-b border-n-6 pb-10 lg:mb-14 lg:flex-row lg:items-end lg:justify-between"
           >
             <div className="max-w-2xl">
-              <div className="mb-5 flex items-center gap-3">
-                <span className="h-px w-8 bg-[#3B82F6]" />
-
-                <span className="font-code text-[10px] uppercase tracking-[0.2em] text-[#60A5FA]">
-                  MaverickIgnite / Team
-                </span>
-              </div>
-
               <h1 className="h2">
                 Meet the people
                 <br />

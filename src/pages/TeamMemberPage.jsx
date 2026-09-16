@@ -6,203 +6,28 @@ import Section from "../components/Section";
 import { BottomLine } from "../components/design/Hero";
 import AINetworkBackground from "../components/AINetworkBackground";
 
-import { team } from "./Team";
+import { team } from "../config/team";
 
 /* -------------------------------------------------------------------------- */
-/* EMPLOYEE DETAILS                                                           */
+/* ICONS                                                                      */
 /* -------------------------------------------------------------------------- */
 
-/*
-  Add detailed information for each employee here.
-
-  Keep only information you actually want to publish on the website.
-*/
-
-const employeeDetails = {
-  "hifzur-raheman-sanderwale": {
-    title: "Team Member",
-    department: "Engineering",
-    introduction:
-      "Working on the technology, systems, and products that power MaverickIgnite.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Engineering",
-      "Product Development",
-    ],
-  },
-
-  "zeeshan-karmikhan": {
-    title: "Team Member",
-    department: "Engineering",
-    introduction:
-      "Building reliable technology and systems that support MaverickIgnite products.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Backend Development",
-      "Systems",
-      "Engineering",
-    ],
-  },
-
-  "yaseen-sanderwale": {
-    title: "Team Member",
-    department: "AI & Machine Learning",
-    introduction:
-      "Exploring machine learning and intelligent systems to solve practical problems.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Machine Learning",
-      "Artificial Intelligence",
-      "Data",
-    ],
-  },
-
-  "musadiq-sanderwale": {
-    title: "Team Member",
-    department: "Product & Design",
-    introduction:
-      "Helping turn complex ideas into clear, useful, and engaging product experiences.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Product",
-      "Design",
-      "User Experience",
-    ],
-  },
-
-  "tufail-sanderwale": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Contributing to the technology and products being built at MaverickIgnite.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Development",
-      "Product",
-    ],
-  },
-
-  "naveed-patait": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Working across technology and product development to help deliver useful solutions.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Development",
-      "Problem Solving",
-    ],
-  },
-
-  "raquib-qadari": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Helping build and improve the technology behind MaverickIgnite's products.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Development",
-      "Systems",
-    ],
-  },
-
-  "arifa-chamanshaikh": {
-    title: "Team Member",
-    department: "Operations",
-    introduction:
-      "Supporting the people, processes, and operations that keep the team moving.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Operations",
-      "Coordination",
-      "Team Support",
-    ],
-  },
-
-  "mudassir-sanderwale": {
-    title: "Team Member",
-    department: "Engineering",
-    introduction:
-      "Building applications and intelligent technology across AI, data, and software.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Python",
-      "AI & LLMs",
-      "FastAPI",
-      "React",
-      "Data Systems",
-    ],
-  },
-
-  "saklen-sajjan": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Contributing to technology and software development at MaverickIgnite.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Software",
-      "Development",
-    ],
-  },
-
-  "anas-sanderwale": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Working with the team to build practical technology and digital products.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Development",
-      "Digital Products",
-    ],
-  },
-
-  "subhan-sanderwale": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Contributing to the development and evolution of MaverickIgnite products.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Software",
-      "Product Development",
-    ],
-  },
-
-  "asim-bage": {
-    title: "Team Member",
-    department: "Technology",
-    introduction:
-      "Helping build technology and solutions across the MaverickIgnite ecosystem.",
-    about:
-      "Add the employee's short professional introduction here.",
-    expertise: [
-      "Technology",
-      "Development",
-      "Problem Solving",
-    ],
-  },
-};
+const UserIcon = ({ size = 40, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
 
 /* -------------------------------------------------------------------------- */
 /* PAGE                                                                       */
@@ -225,8 +50,6 @@ const TeamMemberPage = () => {
     () => team.find((person) => person.slug === slug),
     [slug]
   );
-
-  const details = employeeDetails[slug];
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -271,13 +94,7 @@ const TeamMemberPage = () => {
     );
   }
 
-  const initials = member.name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
+  const hasPhoto = Boolean(member.photo) && !imageFailed;
   const fileNumber = String(memberIndex + 1).padStart(3, "0");
 
   return (
@@ -343,7 +160,7 @@ const TeamMemberPage = () => {
                       "polygon(0 0, 100% 0, 100% 100%, 1.25rem 100%, 0 calc(100% - 1.25rem))",
                   }}
                 >
-                  {!imageFailed ? (
+                  {hasPhoto ? (
                     <img
                       src={member.photo}
                       alt={member.name}
@@ -360,9 +177,7 @@ const TeamMemberPage = () => {
                           backgroundSize: "18px 18px",
                         }}
                       />
-                      <span className="relative text-4xl font-semibold tracking-wide text-[#60A5FA]">
-                        {initials}
-                      </span>
+                      <UserIcon size={44} className="relative text-[#60A5FA]" />
                     </div>
                   )}
 
@@ -392,14 +207,14 @@ const TeamMemberPage = () => {
               <div className="mb-4 flex items-center gap-3">
                 <span className="h-px w-8 bg-[#3B82F6]" />
                 <span className="font-code text-[10px] uppercase tracking-[0.2em] text-[#60A5FA]">
-                  {details?.department || member.department}
+                  {member.department}
                 </span>
               </div>
 
               <h1 className="h2 relative mb-5 max-w-xl">{member.name}</h1>
 
               <p className="body-1 mb-8 max-w-lg text-n-2">
-                {details?.introduction ||
+                {member.introduction ||
                   "A member of the MaverickIgnite team contributing to the work we build together."}
               </p>
 
@@ -410,16 +225,14 @@ const TeamMemberPage = () => {
                     Role
                   </dt>
                   <dd className="mt-1 text-sm text-n-1">
-                    {details?.title || "Team Member"}
+                    {member.title || "Team Member"}
                   </dd>
                 </div>
                 <div>
                   <dt className="font-code text-[9px] uppercase tracking-[0.18em] text-n-4">
                     Department
                   </dt>
-                  <dd className="mt-1 text-sm text-n-1">
-                    {details?.department || member.department}
-                  </dd>
+                  <dd className="mt-1 text-sm text-n-1">{member.department}</dd>
                 </div>
                 <div>
                   <dt className="font-code text-[9px] uppercase tracking-[0.18em] text-n-4">
@@ -435,20 +248,20 @@ const TeamMemberPage = () => {
                   About
                 </span>
                 <p className="body-2 mt-3 text-n-3">
-                  {details?.about ||
+                  {member.about ||
                     "More information about this team member will be added soon."}
                 </p>
               </div>
 
               {/* Expertise — inline ledger rather than pill tags */}
-              {details?.expertise?.length > 0 && (
+              {member.expertise?.length > 0 && (
                 <div className="mt-8">
                   <span className="font-code text-[9px] uppercase tracking-[0.2em] text-[#3B82F6]">
                     Areas of focus
                   </span>
 
                   <ul className="mt-3 flex max-w-lg flex-wrap gap-x-6 gap-y-2">
-                    {details.expertise.map((item) => (
+                    {member.expertise.map((item) => (
                       <li
                         key={item}
                         className="flex items-center gap-2 text-sm text-n-2"
@@ -493,26 +306,7 @@ const TeamMemberPage = () => {
                 .filter((person) => person.slug !== member.slug)
                 .slice(0, 6)
                 .map((person) => (
-                  <Link
-                    key={person.slug}
-                    to={`/team/${person.slug}`}
-                    className="group flex w-32 flex-shrink-0 flex-col gap-2 px-1 sm:w-36"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden border border-n-6 bg-n-7 transition-colors duration-300 group-hover:border-[#3B82F6]/40">
-                      <img
-                        src={person.photo}
-                        alt={person.name}
-                        className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
-                        onError={(event) => {
-                          event.currentTarget.style.display = "none";
-                        }}
-                      />
-                    </div>
-
-                    <p className="text-xs font-medium text-n-1 group-hover:text-[#60A5FA]">
-                      {person.name}
-                    </p>
-                  </Link>
+                  <FilmstripCard key={person.slug} person={person} />
                 ))}
             </div>
           </div>
@@ -521,6 +315,41 @@ const TeamMemberPage = () => {
 
       <BottomLine />
     </Section>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/* FILMSTRIP CARD                                                             */
+/* -------------------------------------------------------------------------- */
+
+const FilmstripCard = ({ person }) => {
+  const [failed, setFailed] = useState(false);
+  const hasPhoto = Boolean(person.photo) && !failed;
+
+  return (
+    <Link
+      to={`/team/${person.slug}`}
+      className="group flex w-32 flex-shrink-0 flex-col gap-2 px-1 sm:w-36"
+    >
+      <div className="relative aspect-[3/4] overflow-hidden border border-n-6 bg-n-7 transition-colors duration-300 group-hover:border-[#3B82F6]/40">
+        {hasPhoto ? (
+          <img
+            src={person.photo}
+            alt={person.name}
+            className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+            onError={() => setFailed(true)}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-n-8">
+            <UserIcon size={26} className="text-[#60A5FA]/70" />
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs font-medium text-n-1 group-hover:text-[#60A5FA]">
+        {person.name}
+      </p>
+    </Link>
   );
 };
 

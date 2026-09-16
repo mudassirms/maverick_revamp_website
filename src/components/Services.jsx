@@ -39,6 +39,7 @@ const IconPencil = (p) => <Icon {...p} path={<><path d="M12 20h9" /><path d="M16
 const IconCode = (p) => <Icon {...p} path={<><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></>} />;
 const IconRocket = (p) => <Icon {...p} path={<><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z" /><path d="M12 15l-3-3a22 22 0 0 1 2-4A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22.4 22.4 0 0 1-4 2z" /></>} />;
 const IconRefresh = (p) => <Icon {...p} path={<><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15" /></>} />;
+const IconLink = (p) => <Icon {...p} path={<><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" /></>} />;
 const IconCheck = (p) => <Icon {...p} path={<polyline points="4 12 9 17 20 6" />} />;
 const IconSparkle = (p) => <Icon {...p} path={<path d="M12 2l1.8 5.6L19.5 9l-5.7 1.4L12 16l-1.8-5.6L4.5 9l5.7-1.4z" />} />;
 
@@ -105,7 +106,7 @@ const AIPipelineDiagram = () => {
         <path ref={addFlow} d="M22,16 C36,16 36,50 47,50" stroke={DEEP} strokeWidth="0.6" strokeDasharray="2.5 2.5" fill="none" opacity="0.5" />
         <path ref={addFlow} d="M22,50 L47,50" stroke={DEEP} strokeWidth="0.6" strokeDasharray="2.5 2.5" fill="none" opacity="0.5" />
         <path ref={addFlow} d="M22,84 C36,84 36,50 47,50" stroke={DEEP} strokeWidth="0.6" strokeDasharray="2.5 2.5" fill="none" opacity="0.5" />
-        <path ref={addFlow} d="M62,50 L82,50" stroke={BRIGHT} strokeWidth="0.6" strokeDasharray="2.5 2.5" fill="none" opacity="0.6" />
+        <path ref={addFlow} d="M62,50 L74,50" stroke={BRIGHT} strokeWidth="0.6" strokeDasharray="2.5 2.5" fill="none" opacity="0.6" />
       </svg>
 
       <NodeCard icon={<IconDatabase size={16} />} label="Your Data" className="left-[15%] top-[16%]" />
