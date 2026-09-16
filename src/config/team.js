@@ -5,7 +5,7 @@ import subhanPhoto from "../assets/team/subhan.png";
 import ayanPhoto from "../assets/team/Ayan.png";
 import umairPhoto from "../assets/team/umair.jpeg";
 import sufiyanPhoto from "../assets/team/sufiyan.png";
-
+import asimPhoto from "../assets/team/asim.jpeg";
 export const team = [
   {
     name: "Raquib Qadari",
@@ -84,7 +84,7 @@ export const team = [
     slug: "asim-bage",
     department: "Technology",
     title: "Associate software engineer",
-    photo: null,
+    photo: asimPhoto,
     introduction:
       "Helps build technology and solutions across the MaverickIgnite ecosystem.",
     about:
