@@ -1,4 +1,4 @@
-import mudassirPhoto from "../assets/team/mudassir.jpeg";
+import mudassirPhoto from "../assets/team/mudassir.png";
 import saklenPhoto from "../assets/team/saklen.jpeg";
 import anasPhoto from "../assets/team/Anas.jpeg";
 import subhanPhoto from "../assets/team/subhan.png";
@@ -6,13 +6,17 @@ import ayanPhoto from "../assets/team/Ayan.png";
 import umairPhoto from "../assets/team/umair.jpeg";
 import sufiyanPhoto from "../assets/team/sufiyan.png";
 import asimPhoto from "../assets/team/asim.jpeg";
+import raquibPhoto from "../assets/team/raquib.jpeg";
+import arifaPhoto from "../assets/team/arifa.jpg";
+
+
 export const team = [
   {
-    name: "Raquib Qadari",
+    name: "Raquib Qadri",
     slug: "raquib-qadari",
     department: "Technology",
-    title: "Software Engineer",
-    photo: null,
+    title: "Sr. Software Engineer",
+    photo: raquibPhoto,
     introduction:
       "Helps build and improve the technology behind MaverickIgnite's products.",
     about:
@@ -22,9 +26,9 @@ export const team = [
   {
     name: "Arifa Chamanshaikh",
     slug: "arifa-chamanshaikh",
-    department: "Operations",
-    title: "Operations Associate",
-    photo: null,
+    department: "Technology",
+    title: "Sr. Software Engineer",
+    photo: arifaPhoto,
     introduction:
       "Keeps the day-to-day running smoothly so the rest of the team can focus on building.",
     about:
@@ -34,7 +38,7 @@ export const team = [
   {
     name: "Mudassir Sanderwale",
     slug: "mudassir-sanderwale",
-    department: "Engineering",
+    department: "Technology",
     title: "AI & Data Engineer",
     photo: mudassirPhoto,
     introduction:
@@ -47,7 +51,7 @@ export const team = [
     name: "Saklen Sajjan",
     slug: "saklen-sajjan",
     department: "Technology",
-    title: "Associate software engineer",
+    title: "software engineer",
     photo: saklenPhoto,
     introduction:
       "Contributes to the software and technology behind MaverickIgnite's products.",
@@ -59,7 +63,7 @@ export const team = [
     name: "Anas Sanderwale",
     slug: "anas-sanderwale",
     department: "Technology",
-    title: "Associate software engineer",
+    title: "software engineer",
     photo: anasPhoto,
     introduction:
       "Works with the team to build practical technology and digital products.",
@@ -71,7 +75,7 @@ export const team = [
     name: "Subhan Sanderwale",
     slug: "subhan-sanderwale",
     department: "Technology",
-    title: "Associate software engineer",
+    title: "software engineer",
     photo: subhanPhoto,
     introduction:
       "Contributes to the development and evolution of MaverickIgnite's products.",
@@ -83,7 +87,7 @@ export const team = [
     name: "Asim Bage",
     slug: "asim-bage",
     department: "Technology",
-    title: "Associate software engineer",
+    title: "software engineer",
     photo: asimPhoto,
     introduction:
       "Helps build technology and solutions across the MaverickIgnite ecosystem.",

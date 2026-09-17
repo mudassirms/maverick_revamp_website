@@ -1,811 +1,784 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { getServiceBySlug, getRelatedServices } from "../config/services";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useSpring,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
+import { services, getServiceBySlug, getRelatedServices } from "../config/services";
 import { moduleIcons } from "../utils/moduleIcons";
 import Section from "../components/Section";
+import LightAmbient from "../components/LightAmbient";
 
+const ACCENT = "#3B82F6";
+const ACCENT_DEEP = "#1D4ED8";
+const ACCENT_SOFT = "#22D3EE";
 
-// ------------------------------------------------------------
-// Two-tone animated heading
-// ------------------------------------------------------------
-const AnimatedHeading = ({ text, className = "" }) => {
+/* ------------------------------------------------------------------
+   Title set on two lines: everything but the final phrase in white,
+   the closing phrase in the gradient. Reads as a wordmark, not a heading.
+------------------------------------------------------------------ */
+const ServiceTitle = ({ text }) => {
   const words = text.split(" ");
-  const splitAt = words.length > 3 ? words.length - 2 : words.length - 1;
-  const lead = words.slice(0, splitAt);
-  const accent = words.slice(splitAt);
-
-  const wordVariants = {
-    hidden: { opacity: 0, y: 24 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
+  const splitAt = words.length > 3 ? words.length - 2 : Math.max(words.length - 1, 1);
 
   return (
     <motion.h1
-      className={className}
-      initial="hidden"
-      animate="visible"
-      variants={{
-        visible: {
-          transition: {
-            staggerChildren: 0.07,
-            delayChildren: 0.1,
-          },
-        },
-      }}
+      initial={{ opacity: 0, y: 22 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      className="text-[13vw] sm:text-[7.5vw] lg:text-[4.4vw] leading-[0.95] font-bold tracking-tight mb-7"
     >
-      {lead.map((word, i) => (
-        <motion.span
-          key={`lead-${i}`}
-          className="inline-block mr-[0.3em] text-n-1"
-          variants={wordVariants}
-        >
-          {word}
-        </motion.span>
-      ))}
-
-      {accent.map((word, i) => (
-        <motion.span
-          key={`accent-${i}`}
-          className="inline-block mr-[0.3em] bg-gradient-to-r from-[#1D4ED8] to-[#3B82F6] bg-clip-text text-transparent"
-          variants={wordVariants}
-        >
-          {word}
-        </motion.span>
-      ))}
+      <span className="block text-n-1">{words.slice(0, splitAt).join(" ")}</span>
+      <span
+        className="block"
+        style={{
+          background: `linear-gradient(100deg, ${ACCENT}, ${ACCENT_SOFT})`,
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+        }}
+      >
+        {words.slice(splitAt).join(" ")}
+      </span>
     </motion.h1>
   );
 };
 
+/* ------------------------------------------------------------------ */
+const CountUp = ({ value }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const reduce = useReducedMotion();
+  const match = String(value).match(/^(\D*)([\d.,]+)(.*)$/);
+  const [shown, setShown] = useState(match ? 0 : value);
 
-// ------------------------------------------------------------
-// Badge chip
-// ------------------------------------------------------------
-const BadgeChip = ({ label, index }) => (
-  <motion.span
-    initial={{ opacity: 0, y: 16 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    animate={{ y: [0, -6, 0] }}
-    transition={{
-      opacity: {
-        duration: 0.4,
-        delay: index * 0.08,
-      },
-      y: {
-        duration: 3 + (index % 3) * 0.5,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: index * 0.2,
-      },
-    }}
-    className="rounded-full border border-n-6 bg-n-7/80 px-4 py-2 font-code text-xs text-n-2 backdrop-blur-sm"
-  >
-    {label}
-  </motion.span>
-);
+  useEffect(() => {
+    if (!match || !inView) return;
+    const target = parseFloat(match[2].replace(/,/g, ""));
+    if (reduce) return setShown(target);
+    const decimals = (match[2].split(".")[1] || "").length;
+    const start = performance.now();
+    let frame;
+    const tick = (now) => {
+      const t = Math.min((now - start) / 1000, 1);
+      setShown((target * (1 - Math.pow(1 - t, 3))).toFixed(decimals));
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [inView, reduce, value]);
 
+  if (!match) return <span ref={ref}>{value}</span>;
+  return (
+    <span ref={ref}>
+      {match[1]}
+      {Number(shown).toLocaleString()}
+      {match[3]}
+    </span>
+  );
+};
 
-// ------------------------------------------------------------
-// Fallback visual for services without artwork
-// ------------------------------------------------------------
-const IconOrbitGraphic = ({ service, accentColor }) => {
-  const nodes = service.features.slice(0, 5);
+/* ------------------------------------------------------------------
+   Hero visual when a service has no artwork: the capabilities drawn as
+   a live system rather than a static icon. Hovering a node lights its
+   spoke, so the graphic answers you instead of just looping.
+------------------------------------------------------------------ */
+const CapabilityConstellation = ({ service }) => {
+  const [hot, setHot] = useState(null);
+  const nodes = (service.features || []).slice(0, 6);
   const n = nodes.length;
-
   const cx = 200;
-  const cy = 150;
-  const radius = 108;
+  const cy = 160;
+  const r = 112;
+  const patternId = `cc-grid-${service.slug}`;
 
   const points = nodes.map((f, i) => {
-    const angle =
-      (-90 + (360 / Math.max(n, 1)) * i) * (Math.PI / 180);
-
-    return {
-      ...f,
-      x: cx + radius * Math.cos(angle),
-      y: cy + radius * Math.sin(angle),
-    };
+    const a = (-90 + (360 / Math.max(n, 1)) * i) * (Math.PI / 180);
+    return { ...f, x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
   });
 
-  const patternId = `orbit-dotgrid-${service.slug}`;
-
   return (
-    <div className="relative w-full aspect-[4/3] rounded-2xl border border-n-6 bg-n-7 overflow-hidden">
+    <div className="relative w-full aspect-[4/3] rounded-2xl border border-n-6 bg-n-7/60 overflow-hidden backdrop-blur-sm">
       <div
-        className="absolute left-1/2 top-1/2 w-72 h-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl opacity-20 pointer-events-none"
-        style={{ background: accentColor }}
+        className="absolute left-1/2 top-1/2 w-80 h-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[90px] opacity-25 pointer-events-none"
+        style={{ background: ACCENT }}
       />
 
-      <svg viewBox="0 0 400 300" className="relative w-full h-full">
+      <svg viewBox="0 0 400 320" className="relative w-full h-full">
         <defs>
-          <pattern
-            id={patternId}
-            width="18"
-            height="18"
-            patternUnits="userSpaceOnUse"
-          >
-            <circle
-              cx="1"
-              cy="1"
-              r="1"
-              className="fill-n-1"
-              opacity="0.08"
-            />
+          <pattern id={patternId} width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" className="fill-n-1" opacity="0.09" />
           </pattern>
         </defs>
+        <rect width="400" height="320" fill={`url(#${patternId})`} />
 
-        <rect
-          width="400"
-          height="300"
-          fill={`url(#${patternId})`}
+        {/* slowly rotating orbit */}
+        <motion.circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke={ACCENT}
+          strokeOpacity={0.18}
+          strokeDasharray="3 9"
+          animate={{ strokeDashoffset: [0, -48] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
         />
 
-        {n > 0 && (
-          <motion.circle
-            cx={cx}
-            cy={cy}
-            r={radius}
-            fill="none"
-            stroke={accentColor}
-            strokeOpacity={0.15}
-            strokeDasharray="4 8"
-            initial={{ strokeDashoffset: 0 }}
-            animate={{ strokeDashoffset: -48 }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        )}
-
-        {n > 1 &&
-          points.map((p, i) => {
-            const next = points[(i + 1) % n];
-
-            return (
-              <motion.line
-                key={`mesh-${i}`}
-                x1={p.x}
-                y1={p.y}
-                x2={next.x}
-                y2={next.y}
-                stroke={accentColor}
-                strokeOpacity={0.12}
-                initial={{
-                  pathLength: 0,
-                  opacity: 0,
-                }}
-                whileInView={{
-                  pathLength: 1,
-                  opacity: 1,
-                }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.3 + i * 0.08,
-                }}
-              />
-            );
-          })}
-
+        {/* spokes */}
         {points.map((p, i) => (
-          <motion.line
-            key={`spoke-${i}`}
+          <line
+            key={`s-${i}`}
             x1={cx}
             y1={cy}
             x2={p.x}
             y2={p.y}
-            stroke={accentColor}
-            strokeOpacity={0.3}
-            initial={{ pathLength: 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.6,
-              delay: i * 0.08,
-            }}
+            stroke={hot === i ? ACCENT_SOFT : ACCENT}
+            strokeOpacity={hot === i ? 0.9 : 0.22}
+            style={{ transition: "stroke-opacity .3s, stroke .3s" }}
           />
         ))}
 
+        {/* signal travelling out to one node at a time */}
         {points.map((p, i) => (
           <motion.circle
-            key={`pulse-${i}`}
+            key={`p-${i}`}
             r={3}
-            fill={accentColor}
-            initial={{
-              cx,
-              cy,
-              opacity: 0,
-            }}
-            animate={{
-              cx: [cx, p.x],
-              cy: [cy, p.y],
-              opacity: [0, 1, 0],
-            }}
+            fill={ACCENT_SOFT}
+            initial={{ cx, cy, opacity: 0 }}
+            animate={{ cx: [cx, p.x], cy: [cy, p.y], opacity: [0, 1, 0] }}
             transition={{
-              duration: 2,
+              duration: 1.8,
               repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1 + i * 0.35,
+              repeatDelay: n * 0.5,
+              delay: i * 0.5,
+              ease: "easeOut",
             }}
           />
         ))}
 
+        {/* nodes */}
         {points.map((p, i) => (
-          <motion.g
+          <g
             key={p.title}
-            initial={{
-              opacity: 0,
-              y: 6,
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-            }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.4,
-              delay: 0.5 + i * 0.08,
-            }}
+            onMouseEnter={() => setHot(i)}
+            onMouseLeave={() => setHot(null)}
+            style={{ cursor: "default" }}
           >
             <circle
               cx={p.x}
               cy={p.y}
-              r={22}
+              r={hot === i ? 25 : 22}
               className="fill-n-8"
-              stroke={accentColor}
-              strokeOpacity={0.5}
+              stroke={hot === i ? ACCENT_SOFT : ACCENT}
+              strokeOpacity={hot === i ? 1 : 0.45}
+              style={{ transition: "r .25s, stroke .25s" }}
             />
-
             <svg
               x={p.x - 9}
               y={p.y - 9}
               width={18}
               height={18}
               viewBox="0 0 24 24"
-              style={{ color: accentColor }}
+              style={{ color: hot === i ? ACCENT_SOFT : ACCENT }}
             >
               {moduleIcons[p.iconName]}
             </svg>
-          </motion.g>
+          </g>
         ))}
 
+        {/* core */}
         <motion.circle
           cx={cx}
           cy={cy}
-          r={40}
-          className="fill-n-8"
-          stroke={accentColor}
-          strokeWidth={1.5}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        />
-
-        <motion.circle
-          cx={cx}
-          cy={cy}
-          r={40}
+          r={42}
           fill="none"
-          stroke={accentColor}
-          initial={{
-            r: 40,
-            opacity: 0.5,
-          }}
-          animate={{
-            r: 62,
-            opacity: 0,
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeOut",
-          }}
+          stroke={ACCENT}
+          initial={{ r: 42, opacity: 0.45 }}
+          animate={{ r: 68, opacity: 0 }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
         />
-
+        <circle cx={cx} cy={cy} r={42} className="fill-n-8" stroke={ACCENT} strokeWidth={1.5} />
         <svg
-          x={cx - 16}
-          y={cy - 16}
-          width={32}
-          height={32}
+          x={cx - 17}
+          y={cy - 17}
+          width={34}
+          height={34}
           viewBox="0 0 24 24"
-          style={{ color: accentColor }}
+          style={{ color: ACCENT }}
         >
           {moduleIcons[service.iconName]}
         </svg>
       </svg>
+
+      <p className="absolute bottom-4 left-0 right-0 text-center font-code text-[11px] uppercase tracking-[0.18em] text-n-4">
+        {hot !== null ? points[hot].title : `${n} capabilities, one system`}
+      </p>
     </div>
   );
 };
 
+/* ------------------------------------------------------------------
+   Engagement pipeline. Horizontal rail on desktop with a pulse that
+   travels the line; stacked on mobile.
+------------------------------------------------------------------ */
+const Pipeline = ({ steps }) => (
+  <div className="relative">
+    <div className="hidden lg:block absolute left-0 right-0 top-[7px] h-px bg-n-6" />
+    <motion.span
+      className="hidden lg:block absolute top-[3px] w-2.5 h-2.5 rounded-full"
+      style={{ background: ACCENT_SOFT, boxShadow: `0 0 18px ${ACCENT_SOFT}` }}
+      initial={{ left: "0%" }}
+      animate={{ left: "calc(100% - 10px)" }}
+      transition={{ duration: steps.length * 1.6, repeat: Infinity, ease: "easeInOut" }}
+    />
 
-// ------------------------------------------------------------
-// Process step row ("How we get you to the next level")
-// ------------------------------------------------------------
-const ProcessStep = ({ index, total, step }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 24 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-60px" }}
-    transition={{ duration: 0.5, delay: index * 0.06 }}
-    className="relative flex gap-6 py-6"
-  >
-    <div className="flex flex-col items-center">
-      <span className="font-code text-sm text-[#3B82F6]">
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      {index < total - 1 && (
-        <span className="mt-2 w-px flex-1 bg-n-6" />
-      )}
+    <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+      {steps.map((step, i) => (
+        <div key={step.title} className="relative lg:pt-12">
+          <span
+            className="hidden lg:block absolute top-0 left-0 w-3.5 h-3.5 rounded-full border-2 bg-n-8"
+            style={{ borderColor: ACCENT }}
+          />
+          <span className="font-code text-xs tracking-[0.18em]" style={{ color: ACCENT }}>
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <h3 className="h5 mt-2 mb-2">{step.title}</h3>
+          <p className="body-2 text-n-3 max-w-[42ch]">{step.description}</p>
+        </div>
+      ))}
     </div>
-
-    <div className="pb-2">
-      <h5 className="h5 mb-1">{step.title}</h5>
-      <p className="body-2 text-n-3 max-w-lg">{step.description}</p>
-    </div>
-  </motion.div>
+  </div>
 );
 
+/* ------------------------------------------------------------------
+   Features as a selector instead of a card grid: pick one on the left,
+   read it on the right.
+------------------------------------------------------------------ */
+const FeatureExplorer = ({ features }) => {
+  const [active, setActive] = useState(0);
+  const f = features[active];
 
-// ------------------------------------------------------------
-// Reference work / case study card
-// ------------------------------------------------------------
-const CaseStudyCard = ({ study, index }) => {
-  const card = (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
-      className="group rounded-2xl border border-n-6 bg-n-7 overflow-hidden hover:border-[#3B82F6]/50 transition-colors"
-    >
-      {study.media && (
-        <div className="aspect-video overflow-hidden bg-n-8">
-          {study.mediaType === "video" ? (
-            <video
-              src={study.media}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
+  return (
+    <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-10 lg:gap-16">
+      <div className="border-t border-n-6">
+        {features.map((item, i) => (
+          <button
+            key={item.title}
+            type="button"
+            onMouseEnter={() => setActive(i)}
+            onFocus={() => setActive(i)}
+            onClick={() => setActive(i)}
+            aria-pressed={active === i}
+            className="group relative w-full flex items-center gap-4 py-5 border-b border-n-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+          >
+            <span
+              className="font-code text-xs w-7 shrink-0"
+              style={{ color: active === i ? ACCENT : undefined }}
+            >
+              <span className={active === i ? "" : "text-n-4"}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </span>
+            <span
+              className={`h5 transition-colors ${
+                active === i ? "text-n-1" : "text-n-4 group-hover:text-n-2"
+              }`}
+            >
+              {item.title}
+            </span>
+            <span
+              className="absolute left-0 bottom-0 h-px transition-all duration-500"
+              style={{
+                width: active === i ? "100%" : "0%",
+                background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_SOFT}, transparent)`,
+              }}
             />
-          ) : (
-            <img
-              src={study.media}
-              alt={study.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          )}
-        </div>
-      )}
-
-      <div className="p-6">
-        {study.tag && (
-          <span className="font-code text-xs uppercase tracking-wider text-n-4">
-            {study.tag}
-          </span>
-        )}
-
-        <h5 className="h5 mt-2 mb-1 group-hover:text-[#3B82F6] transition-colors">
-          {study.title}
-        </h5>
-
-        <p className="body-2 text-n-3">{study.description}</p>
+          </button>
+        ))}
       </div>
-    </motion.div>
-  );
 
-  return study.link ? (
-    <Link to={study.link} className="block">
-      {card}
-    </Link>
-  ) : (
-    card
+      <div className="relative rounded-2xl border border-n-6 bg-n-7/60 backdrop-blur-sm p-8 lg:p-10 min-h-[16rem] overflow-hidden">
+        <div
+          className="absolute -top-20 -right-16 w-60 h-60 rounded-full blur-[90px] opacity-25 pointer-events-none"
+          style={{ background: ACCENT }}
+        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={f.title}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="relative"
+          >
+            <span
+              className="flex items-center justify-center w-14 h-14 mb-6 rounded-2xl border"
+              style={{ borderColor: `${ACCENT}55`, color: ACCENT, background: `${ACCENT}14` }}
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                {moduleIcons[f.iconName]}
+              </svg>
+            </span>
+            <h3 className="h4 mb-3">{f.title}</h3>
+            <p className="body-1 text-n-3 max-w-[48ch]">{f.description}</p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 
-
-// ------------------------------------------------------------
-// Service Detail Page
-// ------------------------------------------------------------
+/* ================================================================== */
 const ServiceDetail = () => {
   const { slug } = useParams();
-
+  const navigate = useNavigate();
   const service = getServiceBySlug(slug);
 
-  const navigate = useNavigate();
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-
-  if (!service) {
-    return <Navigate to="/" replace />;
-  }
-
+  if (!service) return <Navigate to="/" replace />;
 
   const related = getRelatedServices(slug);
-
-  const accentColor = "#3B82F6";
-
+  const index = services.findIndex((s) => s.slug === slug);
+  const prevService = services[(index - 1 + services.length) % services.length];
+  const nextService = services[(index + 1) % services.length];
 
   const goToContact = () => {
     if (window.location.pathname !== "/") {
-      window.location.href = "/#contact";
-    } else {
-      document.getElementById("contact")?.scrollIntoView({
-        behavior: "smooth",
-      });
+      navigate("/#contact");
+      setTimeout(
+        () => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }),
+        100
+      );
+      return;
     }
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleServicesClick = (e) => {
+  const goToServices = (e) => {
     e.preventDefault();
-
     if (window.location.pathname !== "/") {
       navigate("/#services");
-
-      setTimeout(() => {
-        document.getElementById("services")?.scrollIntoView({
-          behavior: "smooth",
-        });
-      }, 100);
-    } else {
-      document.getElementById("services")?.scrollIntoView({
-        behavior: "smooth",
-      });
+      setTimeout(
+        () => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }),
+        100
+      );
+      return;
     }
+    document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
   };
-
 
   return (
     <div className="relative overflow-hidden">
-
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.15]"
+      <motion.div
         style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-          maskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 0%, black, transparent)",
+          scaleX: progress,
+          transformOrigin: "0%",
+          background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_SOFT})`,
         }}
+        className="fixed top-0 left-0 right-0 h-[2px] z-40"
       />
 
-      <div
-        className="absolute -top-40 -left-40 w-[32rem] h-[32rem] rounded-full blur-[130px] opacity-20 pointer-events-none"
-        style={{ background: "#1D4ED8" }}
-      />
+      {/* backdrop: light, white-based ambient glow — matches the rest of the site */}
+      <LightAmbient color={ACCENT} accent={ACCENT_SOFT} />
 
-      <div
-        className="absolute top-40 -right-40 w-[26rem] h-[26rem] rounded-full blur-[120px] opacity-10 pointer-events-none"
-        style={{ background: "#3B82F6" }}
-      />
-
-
-      <Section className="pt-[8rem]" id={`service-${slug}`}>
+      <Section className="pt-[8rem] !pb-0" id={`service-${slug}`}>
         <div className="w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 relative z-2">
 
-          {/* ==================================================
-              BREADCRUMB
-             ================================================== */}
-          <nav
-            aria-label="Breadcrumb"
-            className="mb-10 flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
-          >
-            <Link to="/" className="text-n-4 hover:text-[#3B82F6] transition-colors">
-              Home
-            </Link>
-
-            <span className="text-n-1 select-none">›</span>
-
-            <button
-              type="button"
-              onClick={handleServicesClick}
-              className="text-n-4 hover:text-[#3B82F6] transition-colors cursor-pointer"
+          {/* ---------- breadcrumb ---------- */}
+          <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+            <nav
+              aria-label="Breadcrumb"
+              className="flex flex-wrap items-center gap-2 font-code text-xs uppercase tracking-wider"
             >
-              Services
-            </button>
+              <Link to="/" className="text-n-4 hover:text-[#3B82F6] transition-colors">
+                Home
+              </Link>
+              <span className="text-n-5 select-none">/</span>
+              <button
+                type="button"
+                onClick={goToServices}
+                className="text-n-4 hover:text-[#3B82F6] transition-colors"
+              >
+                Services
+              </button>
+              <span className="text-n-5 select-none">/</span>
+              <span className="text-[#3B82F6]" aria-current="page">
+                {service.title}
+              </span>
+            </nav>
 
-            <span className="text-n-1 select-none">›</span>
-
-            <span className="text-[#3B82F6]" aria-current="page">
-              {service.title}
+            <span className="flex items-center gap-2 font-code text-xs uppercase tracking-wider text-n-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Service {String(index + 1).padStart(2, "0")} of{" "}
+              {String(services.length).padStart(2, "0")}
             </span>
-          </nav>
+          </div>
 
-
-          {/* ==================================================
-              HERO
-             ================================================== */}
-          <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center mb-16 lg:mb-20">
-
+          {/* ---------- hero ---------- */}
+          <div className="grid lg:grid-cols-[1.05fr_1fr] gap-14 xl:gap-20 items-center pb-20 lg:pb-28">
             <div>
               <motion.span
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 mb-6 rounded-full border border-[#3B82F6]/40 bg-[#1D4ED8]/10 px-4 py-2"
+                className="inline-flex items-center gap-2.5 mb-7 rounded-full border border-[#3B82F6]/40 bg-[#1D4ED8]/10 px-4 py-2"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" className="text-[#3B82F6]">
+                <svg viewBox="0 0 24 24" width="15" height="15" className="text-[#3B82F6]">
                   {moduleIcons[service.iconName]}
                 </svg>
-
-                <span className="font-code text-xs text-n-2">{service.tagline}</span>
+                <span className="font-code text-xs uppercase tracking-[0.16em] text-n-2">
+                  {service.tagline}
+                </span>
               </motion.span>
 
-              <AnimatedHeading text={service.title} className="h1 mb-6" />
+              <ServiceTitle text={service.title} />
 
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
-                className="body-1 text-n-3 mb-8 max-w-xl"
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="body-1 text-n-3 max-w-[56ch] mb-9 !leading-normal"
               >
                 {service.description}
               </motion.p>
 
-              {service.highlights?.length > 0 && (
-                <ul className="body-2 mb-8">
-                  {service.highlights.map((item, i) => (
-                    <motion.li
-                      key={item}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.4 + i * 0.06 }}
-                      className="flex items-center gap-3 py-2"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6]" />
-                      {item}
-                    </motion.li>
-                  ))}
-                </ul>
-              )}
-
-              {/* Dual CTA row */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex flex-wrap items-center gap-4"
+                transition={{ duration: 0.6, delay: 0.25 }}
+                className="flex flex-wrap items-center gap-4 mb-10"
               >
                 <button
                   onClick={goToContact}
-                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-code text-xs font-bold uppercase tracking-wider text-n-8 transition-transform hover:scale-[1.03]"
-                  style={{ background: "linear-gradient(90deg, #1D4ED8, #3B82F6)" }}
+                  className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 font-code text-xs font-bold uppercase tracking-wider text-n-8 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3B82F6]"
+                  style={{ background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_DEEP})` }}
                 >
-                  Let&apos;s build this
-                  <span aria-hidden>→</span>
+                  Start a project
+                  <span aria-hidden>↗</span>
                 </button>
-
                 <Link
                   to="/contact"
-                  className="inline-flex items-center gap-2 rounded-xl border border-n-6 px-6 py-3 font-code text-xs font-bold uppercase tracking-wider text-n-1 hover:border-[#3B82F6]/50 hover:text-[#3B82F6] transition-colors"
+                  className="inline-flex items-center rounded-xl border border-n-6 px-7 py-3.5 font-code text-xs font-bold uppercase tracking-wider text-n-1 hover:border-[#3B82F6]/60 hover:text-[#3B82F6] transition-colors"
                 >
-                  Talk to us
+                  Book a call
                 </Link>
-              </motion.div>
-            </div>
-
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative"
-              >
-                {service.image ? (
-                  <>
-                    <div
-                      className="absolute -inset-6 rounded-[2rem] blur-3xl opacity-20 pointer-events-none"
-                      style={{ background: accentColor }}
-                    />
-
-                    <motion.div
-                      animate={{ y: [0, -10, 0] }}
-                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                      className="relative rounded-2xl border border-n-6 overflow-hidden shadow-2xl"
-                    >
-                      <img src={service.image} alt={service.title} className="w-full h-auto block" />
-                    </motion.div>
-                  </>
-                ) : (
-                  <IconOrbitGraphic service={service} accentColor={accentColor} />
-                )}
               </motion.div>
 
               {service.badges?.length > 0 && (
-                <div className="flex flex-wrap gap-3 mt-6 justify-center lg:justify-start">
-                  {service.badges.map((b, i) => (
-                    <BadgeChip key={b} label={b} index={i} />
+                <div className="flex flex-wrap gap-2">
+                  {service.badges.map((b) => (
+                    <span
+                      key={b}
+                      className="rounded-full border border-n-6 bg-n-7/70 px-3.5 py-1.5 font-code text-xs text-n-2"
+                    >
+                      {b}
+                    </span>
                   ))}
                 </div>
               )}
             </div>
-          </div>
 
-
-          {/* ==================================================
-              PROCESS — "How we get you to the next level"
-             ================================================== */}
-          {service.process?.length > 0 && (
-            <div className="mb-16 lg:mb-20 pt-10 border-t border-n-6">
-              <p className="tagline text-n-4 mb-2">The process</p>
-              <h3 className="h3 mb-8 max-w-xl">
-                How we take {service.title.toLowerCase()} from idea to launch
-              </h3>
-
-              <div className="grid lg:grid-cols-2 lg:gap-x-16">
-                {service.process.map((step, i) => (
-                  <ProcessStep
-                    key={step.title}
-                    index={i}
-                    total={service.process.length}
-                    step={step}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="relative"
+            >
+              {service.image ? (
+                <>
+                  <div
+                    className="absolute -inset-8 rounded-[3rem] blur-[90px] opacity-30 pointer-events-none"
+                    style={{ background: ACCENT }}
                   />
-                ))}
-              </div>
-            </div>
-          )}
+                  <div className="relative rounded-2xl border border-n-6 overflow-hidden shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]">
+                    <img src={service.image} alt="" className="w-full h-auto block" />
+                  </div>
+                </>
+              ) : (
+                <CapabilityConstellation service={service} />
+              )}
+            </motion.div>
+          </div>
+        </div>
 
-
-          {/* ==================================================
-              TYPICAL USE CASES
-             ================================================== */}
-          {service.useCases?.length > 0 && (
-            <div className="mb-16 lg:mb-20 pt-10 border-t border-n-6">
-              <p className="tagline text-n-4 mb-2">Where it fits</p>
-              <h3 className="h3 mb-8 max-w-xl">Typical use cases</h3>
-
-              <ul className="grid sm:grid-cols-2 gap-x-10 gap-y-4">
-                {service.useCases.map((useCase, i) => (
-                  <motion.li
-                    key={useCase}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.05 }}
-                    className="flex items-start gap-3 body-2 text-n-2"
+        {/* ---------- outcomes band ---------- */}
+        {service.stats?.length > 0 && (
+          <div className="relative z-2 border-y border-n-6 bg-n-7/40 backdrop-blur-sm">
+            <div className="w-full max-w-[1680px] mx-auto grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-n-6">
+              {service.stats.map((stat) => (
+                <div key={stat.label} className="px-6 lg:px-10 py-12">
+                  <p
+                    className="text-4xl lg:text-5xl font-bold tracking-tight mb-2"
+                    style={{ color: ACCENT }}
                   >
-                    <span className="mt-2 w-1.5 h-1.5 shrink-0 rounded-full bg-gradient-to-br from-[#1D4ED8] to-[#3B82F6]" />
-                    {useCase}
-                  </motion.li>
+                    <CountUp value={stat.value} />
+                  </p>
+                  <p className="font-code text-xs uppercase tracking-wider text-n-4">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 relative z-2">
+
+          {/* ---------- what you get ---------- */}
+          {service.highlights?.length > 0 && (
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 py-20 lg:py-24">
+              <div>
+                <h2 className="h2 leading-[1.04] mb-5 max-w-[14ch]">
+                  What you actually get.
+                </h2>
+                <p className="body-2 text-n-3 max-w-[44ch] !leading-normal">{service.shortDescription}</p>
+              </div>
+
+              <ul>
+                {service.highlights.map((item) => (
+                  <li
+                    key={item}
+                    className="group flex items-center gap-4 py-5 border-b border-n-6 first:border-t first:border-n-6"
+                  >
+                    <span
+                      className="flex items-center justify-center w-7 h-7 shrink-0 rounded-full border"
+                      style={{ borderColor: `${ACCENT}55`, color: ACCENT, background: `${ACCENT}14` }}
+                    >
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M4 12.5l5 5L20 6.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className="body-2 text-n-1 group-hover:text-[#3B82F6] transition-colors">
+                      {item}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
-
-          {/* ==================================================
-              FEATURE GRID — "Why it works"
-             ================================================== */}
-          {service.features?.length > 0 && (
-            <div className="mb-16 lg:mb-20 pt-10 border-t border-n-6">
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                className="tagline text-n-4 mb-5"
-              >
-                Why it works
-              </motion.p>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {service.features.map((f, i) => (
-                  <motion.div
-                    key={f.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
-                    whileHover={{ y: -4 }}
-                    className="rounded-2xl border border-n-6 bg-n-7 p-6"
-                  >
-                    <span className="flex items-center justify-center w-11 h-11 mb-4 rounded-xl border border-[#3B82F6]/40 text-[#3B82F6]">
-                      <svg viewBox="0 0 24 24" width="20" height="20">
-                        {moduleIcons[f.iconName]}
-                      </svg>
-                    </span>
-
-                    <h5 className="h5 mb-1">{f.title}</h5>
-                    <p className="body-2 text-n-3">{f.description}</p>
-                  </motion.div>
-                ))}
+          {/* ---------- engagement pipeline ---------- */}
+          {service.process?.length > 0 && (
+            <div className="py-16 lg:py-24 border-t border-n-6">
+              <div className="grid lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-20 items-end mb-14">
+                <h2 className="h2 leading-[1.04] max-w-[18ch]">
+                  How the work actually runs.
+                </h2>
+                <p className="body-2 text-n-3 max-w-[46ch] !leading-normal">
+                  {service.processNote ||
+                    "Four stages, each with something you can see and sign off on before the next one starts."}
+                </p>
               </div>
+
+              <Pipeline steps={service.process} />
             </div>
           )}
 
+          {/* ---------- features explorer ---------- */}
+          {service.features?.length > 0 && (
+            <div className="py-16 lg:py-24 border-t border-n-6">
+              <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
+                <h2 className="h2 leading-[1.04] max-w-[16ch]">Why this approach holds up.</h2>
+                <span className="font-code text-xs uppercase tracking-wider text-n-4">
+                  Hover to read each one
+                </span>
+              </div>
 
-          {/* ==================================================
-              REFERENCE WORK — case studies for this service
-             ================================================== */}
+              <FeatureExplorer features={service.features} />
+            </div>
+          )}
+
+          {/* ---------- use cases ---------- */}
+          {service.useCases?.length > 0 && (
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 lg:gap-20 py-16 lg:py-24 border-t border-n-6">
+              <h2 className="h2 leading-[1.04] max-w-[12ch]">Where it fits.</h2>
+
+              <ul className="grid sm:grid-cols-2 gap-x-10">
+                {service.useCases.map((useCase) => (
+                  <li
+                    key={useCase}
+                    className="flex items-start gap-3 body-2 text-n-2 py-4 border-b border-n-6"
+                  >
+                    <span
+                      className="mt-2.5 w-1.5 h-1.5 shrink-0 rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_SOFT})` }}
+                    />
+                    {useCase}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* ---------- outcome quote ---------- */}
+          {service.outcomeQuote && (
+            <figure className="py-16 lg:py-24 border-t border-n-6">
+              <div
+                className="relative rounded-2xl bg-n-7 px-8 py-12 lg:px-14 lg:py-16 overflow-hidden"
+                style={{ borderLeft: `4px solid ${ACCENT}` }}
+              >
+                <div
+                  className="absolute -top-24 -right-16 w-72 h-72 rounded-full blur-[100px] opacity-20 pointer-events-none"
+                  style={{ background: ACCENT }}
+                />
+                <figcaption className="font-code text-xs uppercase tracking-wider text-n-4 mb-6">
+                  What clients say afterwards
+                </figcaption>
+                <blockquote className="h3 max-w-[26ch] leading-[1.15] text-n-1">
+                  &ldquo;{service.outcomeQuote}&rdquo;
+                </blockquote>
+              </div>
+            </figure>
+          )}
+
+          {/* ---------- reference work ---------- */}
           {service.caseStudies?.length > 0 && (
-            <div className="mb-16 lg:mb-20 pt-10 border-t border-n-6">
-              <p className="tagline text-n-4 mb-2">Reference work</p>
-              <h3 className="h3 mb-8 max-w-xl">
-                Projects we&apos;ve built for this service
-              </h3>
+            <div className="py-16 lg:py-24 border-t border-n-6">
+              <h2 className="h2 leading-[1.04] mb-12 max-w-[16ch]">Work we&apos;ve shipped.</h2>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {service.caseStudies.map((study, i) => (
-                  <CaseStudyCard key={study.title} study={study} index={i} />
-                ))}
+                {service.caseStudies.map((study) => {
+                  const inner = (
+                    <div className="group h-full rounded-2xl border border-n-6 bg-n-7/60 backdrop-blur-sm overflow-hidden hover:border-[#3B82F6]/60 transition-colors">
+                      {study.media && (
+                        <div className="aspect-video overflow-hidden bg-n-8">
+                          {study.mediaType === "video" ? (
+                            <video src={study.media} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                          ) : (
+                            <img
+                              src={study.media}
+                              alt=""
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          )}
+                        </div>
+                      )}
+                      <div className="p-6">
+                        {study.tag && (
+                          <span className="font-code text-xs uppercase tracking-wider text-n-4">
+                            {study.tag}
+                          </span>
+                        )}
+                        <h3 className="h5 mt-2 mb-2 group-hover:text-[#3B82F6] transition-colors">
+                          {study.title}
+                        </h3>
+                        <p className="body-2 text-n-3">{study.description}</p>
+                      </div>
+                    </div>
+                  );
+
+                  return study.link ? (
+                    <Link key={study.title} to={study.link} className="block h-full">
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div key={study.title}>{inner}</div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-
-          {/* ==================================================
-              RELATED / OTHER SERVICES
-             ================================================== */}
+          {/* ---------- related ---------- */}
           {related.length > 0 && (
-            <div className="mb-16 lg:mb-20 pt-10 border-t border-n-6">
-              <p className="tagline text-n-4 mb-5">Other services</p>
-
-              <div className="flex flex-wrap gap-4">
+            <div className="py-14 border-t border-n-6">
+              <p className="font-code text-xs uppercase tracking-wider text-n-4 mb-5">
+                Other services
+              </p>
+              <div className="flex flex-wrap gap-3">
                 {related.map((s) => (
                   <Link
                     key={s.slug}
                     to={`/services/${s.slug}`}
-                    className="rounded-xl border border-n-6 px-5 py-3 font-code text-xs uppercase tracking-wider text-n-1 hover:border-[#3B82F6]/50 hover:text-[#3B82F6] transition-colors"
+                    className="inline-flex items-center gap-2.5 rounded-xl border border-n-6 px-5 py-3 font-code text-xs uppercase tracking-wider text-n-1 hover:border-[#3B82F6]/60 hover:text-[#3B82F6] transition-colors"
                   >
-                    {s.title} →
+                    <svg viewBox="0 0 24 24" width="14" height="14" style={{ color: ACCENT }}>
+                      {moduleIcons[s.iconName]}
+                    </svg>
+                    {s.title}
                   </Link>
                 ))}
               </div>
             </div>
           )}
 
-
-          {/* ==================================================
-              CLOSING CTA
-             ================================================== */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.6 }}
-            className="pt-10 border-t border-n-6 text-center lg:text-left"
-          >
-            <p className="tagline text-n-4 mb-2">Contact</p>
-            <h3 className="h3 mb-6 max-w-2xl mx-auto lg:mx-0">
-              Ready to start {service.title.toLowerCase()}?
-            </h3>
-
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-              <button
-                onClick={goToContact}
-                className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-code text-xs font-bold uppercase tracking-wider text-n-8 transition-transform hover:scale-[1.03]"
-                style={{ background: "linear-gradient(90deg, #1D4ED8, #3B82F6)" }}
+          {/* ---------- prev / next ---------- */}
+          {services.length > 1 && (
+            <div className="py-14 border-t border-n-6 grid sm:grid-cols-2 gap-5">
+              <Link
+                to={`/services/${prevService.slug}`}
+                className="group rounded-2xl border border-n-6 bg-n-7/60 backdrop-blur-sm p-7 hover:border-[#3B82F6]/60 transition-colors"
               >
-                Let&apos;s build this
-                <span aria-hidden>→</span>
-              </button>
+                <span className="font-code text-xs uppercase tracking-wider text-n-4">
+                  Previous service
+                </span>
+                <p className="h5 mt-2 group-hover:text-[#3B82F6] transition-colors">
+                  {prevService.title}
+                </p>
+              </Link>
 
               <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 rounded-xl border border-n-6 px-6 py-3 font-code text-xs font-bold uppercase tracking-wider text-n-1 hover:border-[#3B82F6]/50 hover:text-[#3B82F6] transition-colors"
+                to={`/services/${nextService.slug}`}
+                className="group rounded-2xl border border-n-6 bg-n-7/60 backdrop-blur-sm p-7 text-right hover:border-[#3B82F6]/60 transition-colors"
               >
-                Contact us
+                <span className="font-code text-xs uppercase tracking-wider text-n-4">
+                  Next service
+                </span>
+                <p className="h5 mt-2 group-hover:text-[#3B82F6] transition-colors">
+                  {nextService.title}
+                </p>
               </Link>
             </div>
-          </motion.div>
+          )}
+        </div>
 
+        {/* ---------- closing CTA ---------- */}
+        <div className="relative z-2 border-t border-n-6 bg-n-7/30">
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.12]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)",
+              backgroundSize: "56px 56px",
+            }}
+          />
+          <div className="relative w-full max-w-[1680px] mx-auto px-6 lg:px-10 xl:px-16 py-20 lg:py-28 grid lg:grid-cols-[1.2fr_auto] gap-10 items-end">
+            <div>
+              <p
+                className="font-code text-xs uppercase tracking-wider mb-4"
+                style={{ color: ACCENT }}
+              >
+                Start a conversation
+              </p>
+              <h2 className="h2 leading-[1.04] mb-5 max-w-[16ch]">
+                Ready to start {service.title.toLowerCase()}?
+              </h2>
+              <p className="body-2 text-n-3 max-w-[50ch] !leading-normal">
+                Send us the problem in your own words. We&apos;ll come back with a scope, a
+                timeline, and what the first two weeks look like.
+              </p>
+            </div>
+
+            <button
+              onClick={goToContact}
+              className="inline-flex items-center gap-2 rounded-xl px-8 py-4 font-code text-xs font-bold uppercase tracking-wider text-n-8 transition-transform hover:scale-[1.03]"
+              style={{ background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_DEEP})` }}
+            >
+              Contact us
+              <span aria-hidden>↗</span>
+            </button>
+          </div>
         </div>
       </Section>
     </div>

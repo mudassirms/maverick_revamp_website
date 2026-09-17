@@ -17,7 +17,7 @@ import ProductDetail from "./pages/ProductDetail";
 import ServiceDetail from "./pages/ServiceDetail";
 import Careers from "./pages/Careers";
 import Team from "./pages/Team";
-import TeamMemberPage from "./pages/TeamMemberPage";
+// import TeamMemberPage from "./pages/TeamMemberPage";
 
 const Home = () => {
   return (
@@ -63,7 +63,7 @@ const App = () => {
 
         {/* Team */}
         <Route path="/team" element={<Team />} />
-        <Route path="/team/:slug" element={<TeamMemberPage />} />
+        {/* <Route path="/team/:slug" element={<TeamMemberPage />} /> */}
 
         {/* 404 / unknown routes */}
         <Route path="*" element={<Home />} />

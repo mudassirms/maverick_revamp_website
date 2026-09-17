@@ -103,16 +103,23 @@ const Header = () => {
       name: "Careers",
       href: "/careers",
     },
-    {
-      name: "Team",
-      href: "/team",
-    },
   ];
 
   // --------------------------------------------------
   // DROPDOWN ITEMS
   // --------------------------------------------------
   const dropdownItems = {
+    About: [
+      {
+        name: "About Us",
+        href: "/about",
+      },
+      {
+        name: "Meet the Team",
+        href: "/team",
+      },
+    ],
+
     Products: products.map((p) => ({
       name: p.title,
       href: `/products/${p.slug}`,
@@ -127,10 +134,6 @@ const Header = () => {
       {
         name: "Open Roles",
         href: "/careers",
-      },
-      {
-        name: "Culture",
-        href: "/careers#life-at-maverick",
       },
     ],
   };

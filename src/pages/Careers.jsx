@@ -1,6 +1,7 @@
 // pages/Careers.jsx
-import { useState } from "react";
-import { MapPin, Clock, Briefcase, ChevronDown, ArrowRight, Mail } from "lucide-react";
+import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, ChevronDown, ArrowUpRight } from "lucide-react";
 
 /* ============================================================
    DATA — edit freely, no structural changes needed
@@ -56,7 +57,7 @@ const openRoles = [
     location: "Bengaluru",
     dept: "People",
     description:
-      "Run the hiring pipeline end to end, own onboarding, and help keep the culture you'll see below actually true day to day.",
+      "Run the hiring pipeline end to end and own onboarding, from the first reply to someone's first week.",
     requirements: [
       "1–3 years in HR or talent acquisition",
       "Organized, and comfortable owning a process",
@@ -65,115 +66,247 @@ const openRoles = [
   },
 ];
 
+const departments = ["All", ...new Set(openRoles.map((r) => r.dept))];
+
+const deptColors = {
+  Engineering: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  Design: "bg-sky-50 text-sky-700 ring-sky-600/20",
+  Sales: "bg-indigo-50 text-indigo-700 ring-indigo-600/20",
+  People: "bg-cyan-50 text-cyan-700 ring-cyan-600/20",
+};
+
+/* ============================================================
+   DECORATIVE SPARKLINE — draws in once on load
+============================================================ */
+
+const HiringSparkline = () => (
+  <svg
+    viewBox="0 0 220 64"
+    className="hidden sm:block w-44 h-16 flex-shrink-0"
+    fill="none"
+  >
+    <defs>
+      <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#2563EB" stopOpacity="0.18" />
+        <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    <motion.path
+      d="M2 46 L34 40 L66 48 L98 22 L130 30 L162 10 L218 16"
+      fill="none"
+      stroke="#2563EB"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      initial={{ pathLength: 0 }}
+      animate={{ pathLength: 1 }}
+      transition={{ duration: 1.1, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M2 46 L34 40 L66 48 L98 22 L130 30 L162 10 L218 16 L218 64 L2 64 Z"
+      fill="url(#sparkFill)"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.5 }}
+    />
+  </svg>
+);
+
+/* ============================================================
+   COMPONENT
+============================================================ */
+
 const Careers = () => {
+  const [query, setQuery] = useState("");
+  const [dept, setDept] = useState("All");
   const [openRoleId, setOpenRoleId] = useState(null);
 
+  const filteredRoles = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return openRoles.filter((role) => {
+      const matchesDept = dept === "All" || role.dept === dept;
+      const matchesQuery =
+        !q ||
+        role.title.toLowerCase().includes(q) ||
+        role.dept.toLowerCase().includes(q) ||
+        role.location.toLowerCase().includes(q);
+      return matchesDept && matchesQuery;
+    });
+  }, [query, dept]);
+
   return (
-    <div className="bg-n-8">
-      {/* ================= PAGE HEADER ================= */}
-      <section className="pt-16 pb-10 sm:pt-24 sm:pb-14">
+    <div className="bg-white min-h-screen">
+      {/* ================= HERO / STATUS ================= */}
+      <section className="pt-20 pb-10 sm:pt-28 sm:pb-14 border-b border-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <span className="font-code text-[11px] font-semibold uppercase tracking-[0.14em] text-[#3B82F6]">
-            Careers at Maverick Ignite
-          </span>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-n-1 leading-tight">
-            Open roles
-          </h1>
-          <p className="mt-4 text-n-3 text-base sm:text-lg">
-            Don&apos;t see a fit? Scroll to the bottom — we&apos;d still like to hear from you.
-          </p>
-        </div>
-      </section>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600" />
+            </span>
+            <span className="text-sm text-slate-500">Hiring now</span>
+          </div>
 
-      {/* ================= OPEN ROLES ================= */}
-      <section className="pb-16 sm:pb-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="space-y-3">
-            {openRoles.map((role) => {
-              const isOpen = openRoleId === role.id;
-
-              return (
-                <div
-                  key={role.id}
-                  className="border border-n-6 rounded-xl overflow-hidden"
-                >
-                  <button
-                    onClick={() => setOpenRoleId(isOpen ? null : role.id)}
-                    className="w-full flex items-center justify-between gap-4 px-5 py-4 sm:px-6 sm:py-5 text-left hover:bg-n-7/40 transition-colors"
-                  >
-                    <div>
-                      <h3 className="text-lg font-semibold text-n-1">{role.title}</h3>
-                      <div className="mt-2 flex flex-wrap gap-3 text-n-4 text-xs font-code uppercase tracking-[0.08em]">
-                        <span className="inline-flex items-center gap-1">
-                          <Briefcase size={12} /> {role.dept}
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <MapPin size={12} /> {role.location}
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <Clock size={12} /> {role.type}
-                        </span>
-                      </div>
-                    </div>
-
-                    <ChevronDown
-                      size={20}
-                      className={`flex-shrink-0 text-n-3 transition-transform duration-200 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-6 sm:px-6 border-t border-n-6 pt-5">
-                      <p className="text-n-3 text-sm sm:text-base">{role.description}</p>
-
-                      <ul className="mt-4 space-y-2">
-                        {role.requirements.map((req) => (
-                          <li
-                            key={req}
-                            className="text-n-3 text-sm flex items-start gap-2"
-                          >
-                            <span className="mt-1.5 w-1 h-1 rounded-full bg-[#3B82F6] flex-shrink-0" />
-                            {req}
-                          </li>
-                        ))}
-                      </ul>
-
-                      <a
-                        href={`mailto:careers@maverickignite.com?subject=Application: ${role.title}`}
-                        className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1D4ED8] text-white font-code text-[11px] font-semibold uppercase tracking-[0.12em] hover:bg-[#1e40af] transition-colors"
-                      >
-                        Apply for this role
-                        <ArrowRight size={13} />
-                      </a>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="mt-5 flex items-end justify-between gap-6">
+            <div>
+              <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 tracking-tight">
+                {openRoles.length}
+              </h1>
+              <p className="mt-2 text-lg sm:text-xl text-slate-600 max-w-md">
+                open roles across {new Set(openRoles.map((r) => r.dept)).size}{" "}
+                teams in Bengaluru.
+              </p>
+            </div>
+            <HiringSparkline />
           </div>
         </div>
       </section>
 
-      {/* ================= CLOSING CTA ================= */}
-      <section className="py-16 sm:py-24 border-t border-n-6">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-n-1">
-            Don&apos;t see the right role?
-          </h2>
-          <p className="mt-3 text-n-3">
-            We&apos;re always open to hearing from people who&apos;d be a good fit.
-            Send us your resume and tell us what you&apos;d want to work on.
-          </p>
+      {/* ================= FILTER BAR ================= */}
+      <section className="py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="relative flex-1">
+              <Search
+                size={17}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search roles, teams, or cities"
+                className="w-full pl-11 pr-4 py-3 rounded-full border border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
 
-          <a
-            href="mailto:careers@maverickignite.com?subject=General Application"
-            className="mt-7 inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#1D4ED8] text-white font-code text-[12px] font-semibold uppercase tracking-[0.12em] hover:bg-[#1e40af] transition-colors"
-          >
-            <Mail size={15} />
-            Send your resume
-          </a>
+            <div className="flex flex-wrap gap-2">
+              {departments.map((d) => {
+                const active = dept === d;
+                return (
+                  <button
+                    key={d}
+                    onClick={() => setDept(d)}
+                    className={`text-sm px-4 py-2 rounded-full border transition-colors whitespace-nowrap ${
+                      active
+                        ? "bg-blue-600 border-blue-600 text-white"
+                        : "border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                    }`}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= ROLE FEED ================= */}
+      <section className="pb-20 sm:pb-28">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          {filteredRoles.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-16 text-center">
+              <p className="text-slate-700 text-lg">
+                Nothing matches that search.
+              </p>
+              <p className="mt-2 text-slate-400 text-sm">
+                Try a different team, or{" "}
+                <button
+                  onClick={() => {
+                    setQuery("");
+                    setDept("All");
+                  }}
+                  className="text-blue-600 hover:underline"
+                >
+                  clear your filters
+                </button>{" "}
+                to see everything open right now.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 divide-y divide-slate-200 overflow-hidden">
+              {filteredRoles.map((role) => {
+                const isOpen = openRoleId === role.id;
+
+                return (
+                  <div key={role.id} className="bg-white">
+                    <button
+                      onClick={() => setOpenRoleId(isOpen ? null : role.id)}
+                      className="w-full flex items-center justify-between gap-4 px-5 py-5 sm:px-6 text-left hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <h3 className="text-base sm:text-lg font-semibold text-slate-900">
+                            {role.title}
+                          </h3>
+                          <span
+                            className={`text-xs font-medium px-2.5 py-1 rounded-full ring-1 ring-inset ${
+                              deptColors[role.dept] ||
+                              "bg-slate-50 text-slate-600 ring-slate-500/20"
+                            }`}
+                          >
+                            {role.dept}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-sm text-slate-500">
+                          {role.location}
+                          <span className="mx-2 text-slate-300">|</span>
+                          {role.type}
+                        </p>
+                      </div>
+
+                      <motion.span
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex-shrink-0 text-slate-400"
+                      >
+                        <ChevronDown size={20} />
+                      </motion.span>
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 pb-6 sm:px-6 pt-1">
+                            <p className="text-slate-600 text-sm sm:text-base">
+                              {role.description}
+                            </p>
+
+                            <ul className="mt-4 space-y-2">
+                              {role.requirements.map((req) => (
+                                <li
+                                  key={req}
+                                  className="text-slate-600 text-sm flex items-start gap-2.5"
+                                >
+                                  <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-500 flex-shrink-0" />
+                                  {req}
+                                </li>
+                              ))}
+                            </ul>
+
+                            <a
+                              href={`mailto:careers@maverickignite.com?subject=Application: ${role.title}`}
+                              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+                            >
+                              Apply for this role
+                              <ArrowUpRight size={15} />
+                            </a>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </div>
